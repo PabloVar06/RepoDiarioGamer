@@ -1,0 +1,10 @@
+import { Request, Response, NextFunction } from "express";
+import * as s from "../services/videojuegos.service";
+export const listar = async (req: Request, res: Response, next: NextFunction) => { try { res.json(await s.listarVideojuegos(String(req.query.filtro ?? "") || undefined)); } catch(e) { next(e); } };
+export const obtener = async (req: Request,res: Response,next: NextFunction) => { try { res.json(await s.obtenerVideojuego(req.params.id)); } catch(e) { next(e); } };
+export const crear = async (req: Request,res: Response,next: NextFunction) => { try { res.status(201).json(await s.crearVideojuego(req.body)); } catch(e) { next(e); } };
+export const actualizar = async (req: Request,res: Response,next: NextFunction) => { try { res.json(await s.actualizarVideojuego(req.params.id,req.body)); } catch(e) { next(e); } };
+export const eliminar = async (req: Request,res: Response,next: NextFunction) => { try { await s.eliminarVideojuego(req.params.id); res.status(204).end(); } catch(e) { next(e); } };
+export const partidas = async (req: Request,res: Response,next: NextFunction) => { try { res.json(await s.listarPartidasVideojuego(req.params.id)); } catch(e) { next(e); } };
+export const resumen = async (req: Request,res: Response,next: NextFunction) => { try { res.json(await s.calcularResumen(req.params.id)); } catch(e) { next(e); } };
+export const logro = async (req: Request,res: Response,next: NextFunction) => { try { res.json(await s.marcarLogro(req.params.id,req.params.logroId,req.body.obtenido)); } catch(e) { next(e); } };
