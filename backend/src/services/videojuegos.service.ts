@@ -47,6 +47,6 @@ export async function calcularResumen(id: string) {
     totalPartidas: partidas.length,
     horasTotales: Math.round((minutos / 60) * 100) / 100,
     ultimaPartida: partidas[0]?.fecha ?? null,
-    porcentajeAvanceActual: partidas[0]?.porcentajeAvance ?? 0
+    porcentajeAvanceActual: partidas.reduce((maximo, partida) => Math.max(maximo, partida.porcentajeAvance), 0)
   };
 }
