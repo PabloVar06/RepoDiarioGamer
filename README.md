@@ -1,143 +1,236 @@
-Diario de Progreso Gamer
-Aplicación web full-stack para registrar videojuegos, sesiones de juego, logros y un resumen calculado del progreso. Permite responder: ¿qué estoy jugando, cuánto tiempo le he dedicado y qué tan avanzado voy?
-Tecnologías y arquitectura
-- Backend: Node.js, Express, TypeScript, Mongoose y MongoDB Atlas.
-- Frontend: React, TypeScript, Vite y React Router.
-- Despliegue previsto: backend como Web Service y frontend como Static Site en Render.
-- Capas del backend: rutas → controladores → servicios → modelos.
-- Servicios del frontend: videojuegosApi.ts y partidasApi.ts, sin llamadas fetch directas desde las páginas.
-proyecto/
+# Diario de Progreso Gamer
+
+Aplicación full-stack para organizar videojuegos, registrar sesiones de juego, marcar logros y consultar un resumen calculado del progreso: **¿qué estoy jugando, cuánto tiempo le he dedicado y qué tan avanzado voy?**
+
+## Tecnologías y estructura
+
+- **Backend:** Node.js, Express, TypeScript, Mongoose y MongoDB Atlas. Arquitectura por capas: `routes → controllers → services → modelos`.
+- **Frontend:** React, TypeScript, Vite, React Router, Tailwind CSS y GSAP.
+- **Despliegue previsto:** backend como *Web Service* y frontend como *Static Site* en Render.
+- **Comunicación:** servicios `frontend/src/api/videojuegosApi.ts` y `partidasApi.ts`, configurados mediante `VITE_API_URL`.
+
+```text
+.
 ├── backend/
 │   ├── src/
-│   │   ├── config/
+│   │   ├── config/env.ts
 │   │   ├── modelos/
+│   │   ├── routes/
 │   │   ├── controllers/
 │   │   ├── services/
-│   │   ├── routes/
 │   │   ├── middlewares/
 │   │   ├── conexionDB.ts
 │   │   ├── apiError.ts
 │   │   ├── app.ts
 │   │   └── index.ts
-│   └── .env.example
+│   └── package.json
 ├── frontend/
+│   ├── public/_redirects
+│   ├── src/
+│   │   ├── api/
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   └── tipos.ts
+│   └── package.json
 └── README.md
-Modelo de datos
-Videojuego
-Campo	Descripción
-nombre	Texto obligatorio.
-plataforma	PC, PlayStation, Xbox, Switch o Movil.
-genero	accion, rol, estrategia, puzzle, deportes u otro.
-estado	jugando, pausado, completado o abandonado.
-logros	Subdocumentos embebidos con nombre, obtenido y, si el esquema lo admite, descripcion.
-createdAt, updatedAt	Marcas de tiempo automáticas (timestamps).
+```
 
+## Modelo de datos
 
-Partida
-Campo	Descripción
-videojuego	ObjectId con ref: "Videojuego".
-fecha	Fecha de la sesión.
-duracionMinutos	Número de minutos, entre 1 y 1440.
-porcentajeAvance	Número entre 0 y 100.
-notas	Texto opcional.
-createdAt, updatedAt	Marcas de tiempo automáticas (timestamps).
+### Videojuego
 
+| Campo | Tipo / validación |
+|---|---|
+| `nombre` | String obligatorio, máximo 120 caracteres |
+| `plataforma` | Enum: `PC`, `PlayStation`, `Xbox`, `Switch`, `Movil` |
+| `genero` | Enum: `Accion`, `Rol`, `Estrategia`, `Puzzle`, `Deportes`, `Terror`, `Otro` |
+| `estado` | Enum: `Jugando`, `Pausado`, `Completado`, `Abandonado`; predeterminado `Jugando` |
+| `logros` | Arreglo de subdocumentos `{ _id, nombre, obtenido }`; `nombre` obligatorio y `obtenido` booleano predeterminado `false` |
+| `createdAt`, `updatedAt` | Timestamps automáticos |
 
-Justificación: los logros se embeben porque son una lista corta propia de cada juego, consultada junto con su ficha. Las partidas se referencian porque su número puede crecer indefinidamente y también deben consultarse de forma independiente.
-Resumen de progreso
-GET /api/videojuegos/:id/resumen obtiene las partidas del juego y calcula el resumen en la capa de servicio (videojuegos.service.ts), no en el controlador ni en el frontend.
-Campo	Cálculo
-totalPartidas	Cantidad de partidas registradas.
-horasTotales	Suma de duracionMinutos dividida entre 60, redondeada a dos decimales.
-ultimaPartida	fecha de la sesión más reciente; null si no hay partidas.
-porcentajeAvanceActual	porcentajeAvance de la sesión más reciente; 0 si no hay partidas.
+**Los enums distinguen mayúsculas de minúsculas.** Usar, por ejemplo, `"Accion"` y `"Completado"`, no `"accion"` ni `"completado"`. Si existen registros antiguos con minúsculas en MongoDB Atlas, deben normalizarse; cambiar el código no modifica los documentos existentes.
 
+### Partida
 
-La sesión más reciente se determina ordenando por fecha descendente.
-API REST
-Método	Ruta	Descripción
-GET	/api/videojuegos?filtro=texto	Listar videojuegos; filtro opcional por nombre.
-GET	/api/videojuegos/:id	Obtener detalle de un videojuego.
-POST	/api/videojuegos	Crear videojuego.
-PUT	/api/videojuegos/:id	Actualizar videojuego.
-DELETE	/api/videojuegos/:id	Eliminar videojuego y sus partidas.
-PATCH	/api/videojuegos/:id/logros/:logroId	Cambiar el valor booleano de obtenido.
-GET	/api/videojuegos/:id/partidas	Consultar partidas de un videojuego.
-GET	/api/videojuegos/:id/resumen	Obtener resumen calculado.
-GET	/api/partidas	Listar partidas con populate("videojuego").
-POST	/api/partidas	Crear partida; validar existencia del videojuego.
-DELETE	/api/partidas/:id	Eliminar partida.
-GET	/api/salud	Comprobar disponibilidad de la API.
+| Campo | Tipo / validación |
+|---|---|
+| `videojuego` | ObjectId obligatorio, `ref: "Videojuego"` |
+| `fecha` | Date obligatorio; el modelo normaliza el día a medianoche UTC |
+| `duracionMinutos` | Number obligatorio, entre 1 y 1440 |
+| `porcentajeAvance` | Number obligatorio, entre 0 y 100 |
+| `notas` | String opcional, máximo 1000 caracteres |
+| `createdAt`, `updatedAt` | Timestamps automáticos |
 
+Los **logros están embebidos** porque pertenecen al juego y se consultan junto a su ficha. Las **partidas están referenciadas** porque su historial puede crecer indefinidamente y consultarse por separado.
 
-Ejemplos de solicitudes
-Crear videojuego (POST /api/videojuegos):
+## Resumen calculado
+
+`GET /api/videojuegos/:id/resumen` se implementa en `backend/src/services/videojuegos.service.ts`:
+
+| Campo | Regla |
+|---|---|
+| `totalPartidas` | Cantidad de sesiones del videojuego |
+| `horasTotales` | Suma de `duracionMinutos` / 60, redondeada a dos decimales |
+| `ultimaPartida` | Fecha de la sesión más reciente o `null` si no hay partidas |
+| `porcentajeAvanceActual` | **Mayor `porcentajeAvance` de todas las sesiones**, o `0` si no hay partidas |
+
+El porcentaje mostrado **no disminuye** si una sesión posterior registra menos avance. Cada partida conserva su porcentaje original. Al eliminar una sesión, el resumen se recalcula con las sesiones restantes.
+
+Ejemplo: tres sesiones de 60, 90 y 30 minutos con avances 80%, 30% y 70% producen `totalPartidas: 3`, `horasTotales: 3` y `porcentajeAvanceActual: 80`.
+
+## API REST
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/videojuegos?filtro=texto` | Listar y filtrar por nombre |
+| GET | `/api/videojuegos/:id` | Obtener detalle |
+| POST | `/api/videojuegos` | Crear videojuego |
+| PUT | `/api/videojuegos/:id` | Actualizar videojuego |
+| DELETE | `/api/videojuegos/:id` | Eliminar videojuego y sus partidas |
+| PATCH | `/api/videojuegos/:id/logros/:logroId` | Marcar o desmarcar un logro |
+| GET | `/api/videojuegos/:id/partidas` | Historial de un videojuego |
+| GET | `/api/videojuegos/:id/resumen` | Resumen calculado |
+| GET | `/api/partidas` | Listar partidas con `populate("videojuego")` |
+| POST | `/api/partidas` | Crear sesión validando la referencia |
+| DELETE | `/api/partidas/:id` | Eliminar una sesión |
+| GET | `/api/salud` | Verificar disponibilidad |
+
+### Ejemplos
+
+Crear videojuego (`POST /api/videojuegos`):
+
+```json
 {
-  "nombre": "Hades",
-  "plataforma": "PC",
-  "genero": "accion",
-  "estado": "jugando",
-  "logros": [
-    { "nombre": "Primera victoria", "obtenido": false }
-  ]
+  "nombre": "Resident Evil 4",
+  "plataforma": "PlayStation",
+  "genero": "Terror",
+  "estado": "Jugando",
+  "logros": [{ "nombre": "Primera victoria", "obtenido": false }]
 }
-Crear partida (POST /api/partidas), reemplazando el ID por el _id real de un videojuego:
+```
+
+Crear partida (`POST /api/partidas`; reemplazar el ID):
+
+```json
 {
-  "videojuego": "ID_DEL_VIDEOJUEGO",
-  "fecha": "2026-10-02T18:00:00.000Z",
+  "videojuego": "ID_REAL_DEL_VIDEOJUEGO",
+  "fecha": "2026-10-20",
   "duracionMinutos": 90,
-  "porcentajeAvance": 35,
-  "notas": "Primera sesión"
+  "porcentajeAvance": 80,
+  "notas": "Sesión de prueba"
 }
-Actualizar logro (PATCH /api/videojuegos/:id/logros/:logroId):
-{ "obtenido": true }
-Manejo de errores
-Los middlewares requestId, logger y errorHandler permiten registrar solicitudes y centralizar las respuestas de error, incluyendo requestId.
-HTTP	Situación
-400	Validación de esquema o identificador mal formado.
-404	Recurso o videojuego referenciado inexistente.
-500	Error inesperado del servidor.
+```
 
+Actualizar logro (`PATCH /api/videojuegos/:id/logros/:logroId`):
 
-Ejecutar localmente
-Requisitos: Node.js 20+ y una base de datos MongoDB Atlas accesible.
-1. En backend/, copia .env.example a .env y configura la cadena de conexión. No publiques .env.
-2. Inicia el backend:
+```json
+{ "obtenido": false }
+```
+
+## Errores y observabilidad
+
+El backend utiliza los middlewares `requestId`, `logger` y `errorHandler` para registrar solicitudes y responder de forma centralizada. Los errores incluyen `requestId`.
+
+| HTTP | Caso |
+|---|---|
+| `400` | Validación de esquema o ID mal formado |
+| `404` | Recurso, logro o referencia inexistente |
+| `500` | Error inesperado |
+
+## Ejecutar localmente
+
+Requisitos: Node.js 20+ y acceso a MongoDB Atlas.
+
+1. En `backend/`, crear `.env` (a partir de `.env.example` si existe):
+
+   ```env
+   MONGODB_URI=TU_CADENA_PRIVADA_DE_ATLAS
+   MONGODB_DB=diario_gamer
+   PORT=3000
+   FRONTEND_URL=http://localhost:5173
+   ```
+
+2. Iniciar backend:
+
+   ```bash
    cd backend
    npm install
    npm run dev
-3. En otra terminal, configura el frontend (si ya está implementado): copia frontend/.env.example a frontend/.env y establece VITE_API_URL=http://localhost:3000/api. Después ejecuta:
+   ```
+
+3. En `frontend/`, crear `.env`:
+
+   ```env
+   VITE_API_URL=http://localhost:3000/api
+   ```
+
+4. Iniciar frontend en otra terminal:
+
+   ```bash
    cd frontend
    npm install
    npm run dev
-4. Comprueba la API en http://localhost:3000/api/salud y abre el frontend en http://localhost:5173.
-Para compilar y ejecutar el backend en modo producción:
-cd backend
-npm run build
-npm start
-Las variables del backend incluyen MONGODB_URI, MONGODB_DB, FRONTEND_URL y el puerto (PORT si así lo define config/env.ts). Revisa .env.example para usar los nombres exactos de tu implementación.
+   ```
 
-Pruebas manuales recomendadas
-1. Crear un videojuego con al menos un logro.
-2. Registrar tres partidas de 60, 90 y 30 minutos, con fechas crecientes y avances de 10, 35 y 67.
-3. Consultar /api/videojuegos/:id/resumen: debe devolver totalPartidas: 3, horasTotales: 3 y porcentajeAvanceActual: 67; ultimaPartida debe coincidir con la tercera fecha.
-4. Marcar un logro mediante PATCH y comprobar el cambio en el detalle.
-5. Provocar y verificar los errores: nombre vacío (400), ID mal formado (400), referencia inexistente (404) y error inesperado (500).
-6. Verificar el comportamiento sin partidas: totalPartidas: 0, horasTotales: 0, ultimaPartida: null y porcentajeAvanceActual: 0.
-Estas son pruebas sugeridas, no resultados certificados de ejecución.
-Despliegue en Render
-Backend — Web Service
-- Root Directory: backend
-- Build Command: npm ci && npm run build
-- Start Command: npm start
-- Variables de entorno: MONGODB_URI, MONGODB_DB=diario_gamer, FRONTEND_URL=https://TU-FRONTEND.onrender.com y, si corresponde, PORT.
-- Configurar CORS para permitir el origen público del frontend.
-Frontend — Static Site
-- Root Directory: frontend
-- Build Command: npm ci && npm run build
-- Publish Directory: dist
-- Variable de entorno de build: VITE_API_URL=https://TU-BACKEND.onrender.com/api
-- Configurar un fallback de rutas para React Router, por ejemplo mediante public/_redirects con /* /index.html 200.
-Sustituye las URLs de ejemplo por las direcciones reales después del despliegue. Las credenciales deben configurarse en el panel de Render, nunca dentro del repositorio.
-Entrega y demostración
-La demostración debe cubrir el flujo: crear videojuego → registrar partidas → ver el resumen actualizado → marcar un logro como obtenido. Antes de entregar, comprobar la integración frontend/backend y actualizar este README con las URLs públicas reales.
+5. Abrir `http://localhost:5173` y comprobar `http://localhost:3000/api/salud`.
+
+Para compilar: `npm run build` en cada carpeta. Para iniciar el backend compilado: `npm start` en `backend/`.
+
+**Seguridad:** no subir `.env`, contraseñas, cadenas de conexión ni `node_modules` a GitHub. `VITE_` expone valores al navegador: no colocar secretos en variables del frontend.
+
+## Funcionalidades del frontend
+
+- Biblioteca de videojuegos y filtro por nombre.
+- Creación y edición de videojuegos.
+- Detalle del juego con estado, logros embebidos, historial y resumen calculado.
+- Registro de partidas y consulta del historial general.
+- Eliminación de partidas desde la interfaz, con confirmación previa.
+- Diseño oscuro tipo *gaming launcher* con Tailwind CSS y animaciones GSAP.
+
+### Nota sobre fechas (pendiente de verificar en la versión actual)
+
+El **modelo del backend** almacena el día de la sesión normalizado a medianoche UTC. Sin embargo, el `App.tsx` inspeccionado todavía contiene un campo `datetime-local` (fecha **y hora**) y muestra fechas mediante `toLocaleDateString()` sin fijar la zona horaria. En zonas como Ecuador esto puede visualizar el **día anterior**. Para cumplir el requisito de elegir solo día, mes y año, queda pendiente sincronizar el formulario a `type="date"`, enviar `YYYY-MM-DD` y mostrar las fechas usando `timeZone: "UTC"`. No se declara este ajuste como implementado hasta comprobarlo en el frontend.
+
+## Pruebas manuales sugeridas
+
+1. Crear un juego con `genero: "Terror"`, `estado: "Jugando"` y varios logros.
+2. Registrar partidas con avances 80%, 30% y 70%; verificar que el resumen mantenga 80%.
+3. Eliminar una partida duplicada; verificar que se actualicen el historial, la cantidad de sesiones, las horas y el máximo si corresponde.
+4. Marcar y desmarcar un logro (`true` ↔ `false`).
+5. Verificar validaciones: nombre vacío (400), ID mal formado (400), videojuego inexistente al crear partida (404).
+6. Verificar que sin partidas el resumen sea `{ "totalPartidas": 0, "horasTotales": 0, "ultimaPartida": null, "porcentajeAvanceActual": 0 }`.
+7. Verificar fechas seleccionadas y visualizadas sin desfase de día tras corregir el formulario.
+
+Estas son pruebas recomendadas, **no una certificación de que se ejecutaron**.
+
+## Despliegue en Render
+
+**Backend — Web Service**
+
+- Root Directory: `backend`
+- Build Command: `npm install && npm run build`
+- Start Command: `npm start`
+- Variables: `MONGODB_URI`, `MONGODB_DB`, `FRONTEND_URL`. Configurar CORS para el dominio público del frontend.
+
+**Frontend — Static Site**
+
+- Root Directory: `frontend`
+- Build Command: `npm install && npm run build`
+- Publish Directory: `dist`
+- Variable de build: `VITE_API_URL=https://savepoint-diariogamer.onrender.com`
+- Para React Router, `public/_redirects` debe contener `/* /index.html 200`.
+
+**Estado:** configuración de despliegue documentada; no se han verificado URLs públicas de producción. Agregarlas cuando estén disponibles.
+
+## 
+
+**Repositorio de Git Hub**
+https://github.com/PabloVar06/RepoDiarioGamer
+
+**Enlaces de Render**
+- Backend: https://savepoint-diariogamer.onrender.com
+- Frontend: https://savepoint-diariogamer-vargas.onrender.com
+
+**Demostración**
+https://youtu.be/SGqsmWl59XU
