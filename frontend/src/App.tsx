@@ -7,8 +7,8 @@ import "./index.css";
 import gsap from "gsap";
 
 const plataformas = ["PC", "PlayStation", "Xbox", "Switch", "Movil"];
-const generos = ["accion", "rol", "estrategia", "puzzle", "deportes", "otro"];
-const estados = ["jugando", "pausado", "completado", "abandonado"];
+const generos = ["Accion", "Rol", "Estrategia", "Puzzle", "Deportes", "Terror", "Otro"];
+const estados = ["Jugando", "Pausado", "Completado", "Abandonado"];
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
   `flex items-center rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
@@ -17,10 +17,10 @@ const navClass = ({ isActive }: { isActive: boolean }) =>
 
 function pillClass(estado: string) {
   const tones: Record<string, string> = {
-    jugando: "bg-gamer-green/15 text-gamer-green border-gamer-green/35",
-    completado: "bg-gamer-blue/15 text-[#9dc4ff] border-gamer-blue/35",
-    pausado: "bg-gamer-yellow/15 text-gamer-yellow border-gamer-yellow/35",
-    abandonado: "bg-gamer-orange/15 text-[#ffad81] border-gamer-orange/35",
+    Jugando: "bg-gamer-green/15 text-gamer-green border-gamer-green/35",
+    Completado: "bg-gamer-blue/15 text-[#9dc4ff] border-gamer-blue/35",
+    Pausado: "bg-gamer-yellow/15 text-gamer-yellow border-gamer-yellow/35",
+    Abandonado: "bg-gamer-orange/15 text-[#ffad81] border-gamer-orange/35",
   };
   return `inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${tones[estado] ?? "border-white/15 bg-white/10"}`;
 }
@@ -156,8 +156,8 @@ function FormJuego() {
   const [error, setError] = useState("");
   const [nombre, setNombre] = useState("");
   const [plataforma, setPlataforma] = useState("PC");
-  const [genero, setGenero] = useState("accion");
-  const [estado, setEstado] = useState("jugando");
+  const [genero, setGenero] = useState("Accion");
+  const [estado, setEstado] = useState("Jugando");
   const [logros, setLogros] = useState("");
   const [juegoOriginal, setJuegoOriginal] = useState<Videojuego | null>(null);
   useEffect(() => {
