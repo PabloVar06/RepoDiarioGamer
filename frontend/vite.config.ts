@@ -5,6 +5,9 @@ import react from "@vitejs/plugin-react";
 // sin tener que instalar el middleware cors() en el servidor.
 export default defineConfig({
   plugins: [react()],
+  css: {
+    postcss: "./postcss.config.cjs",
+  },
   server: {
     port: 5173,
     proxy: {
