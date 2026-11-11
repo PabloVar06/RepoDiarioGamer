@@ -1,0 +1,12 @@
+{
+  "name": "savepoint-harness",
+  "private": true,
+  "scripts": {
+    "harness:install": "python3 scripts/harness.py install",
+    "harness:test": "python3 -B -m unittest discover -s tests/harness -v",
+    "format:staged": "python3 scripts/harness.py format-staged"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
+  }
+}
