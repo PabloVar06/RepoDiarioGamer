@@ -1,10 +1,15 @@
 # Auditoría de SAVEPOINT — E1, E2 y Nebula Arcade
 
 Fecha: **12 de noviembre de 2026**, America/Guayaquil.
-Base Git: **0018a1b6e45f6df7fd51be5c86d70bfe820577aa**, más los cambios de
-cierre del árbol de trabajo, aún sin commit. Estado: **auditoría y cierre técnico
-del alcance aprobado verificados; resultado presentado para revisión**.
-No se aprueba ni ejecuta despliegue. No se hizo staging, commit o push.
+Código auditado y cierre versionados en
+**242135f46809e22ed1deac12e4c05270ff2e891d**:
+`feat: completar E2-FE-01 y E2-VIS-02 y cerrar E2-INT-04`.
+El bloque se desarrolló sobre 0018a1b y se incorporó por invocación manual de la
+skill commit el 12 de noviembre de 2026 a las 10:21:45, America/Guayaquil.
+Estado: **auditoría y cierre técnico del alcance aprobado verificados y
+commiteados**. No se aprueba ni ejecuta despliegue; no se hizo push.
+Esta actualización posterior modifica únicamente auditoría y bitácora,
+sin staging ni nuevo commit y sin volver a ejecutar pruebas de producto.
 
 ## 1. Fuentes, autorización y evolución de resultados
 
@@ -250,21 +255,25 @@ certifican WCAG completa, todos los mensajes/lectores de pantalla ni navegadores
 
 ## 8. Historial Git, precedencia SDD y seguridad
 
-Se revisaron **33 commits de las referencias locales** y nombres de archivos;
-no se reescribió historia ni se consultó el remoto. Los criterios aplicables se
+La auditoría inicial revisó **33 commits de las referencias locales** hasta
+0018a1b y sus nombres de archivos. Posteriormente se comprobó el commit de
+cierre **242135f**, cuyo padre es 0018a1b: incorpora los 14 archivos preparados
+y revisados, con árbol f6badbacc76a5ec837cb49e88a13609713e79b27.
+No se reescribió historia ni se consultó el remoto. Los criterios aplicables se
 comprobaron en el padre de los commits de implementación, no solo en HEAD.
 
-| Entrega                | Evidencia en Git / evaluación                                                                                                                                                                                 |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Producto               | 873d26f incorpora PRD/épicas/backlog antes de los cortes funcionales.                                                                                                                                         |
-| Primera spec/HAB-01    | ca734b6 incorpora specs y código inicial de HAB-01 juntos. Excepción histórica: aprobación en conversación, sin commit documental separado anterior. Se conserva y no se oculta.                              |
-| Ampliación HAB-01      | b67caa4/25d1daf posteriores; cierre explícito documentado.                                                                                                                                                    |
-| HAB-05                 | 1e528cb posterior a specs; se comprobó base /api en la versión anterior.                                                                                                                                      |
-| Meta/CRUD/progreso     | 03f8564/a6663ff posteriores a ca734b6; regularización documental y modelo coinciden en 03f8564, pero reglas del modelo/índice ya existían. No se inventa precedencia de la actualización de ese mismo commit. |
-| Cliente/tokens/fechas  | db3efbe/0fedabd/59bfc98 posteriores a specs. 59bfc98 también actualiza notas; contrato civil y criterios ya estaban antes.                                                                                    |
-| Recuperación/visual E1 | c28df74/8904efc posteriores a specs; VIS-02 solo corte marco/biblioteca, no todo E1.                                                                                                                          |
-| Parser/rachas/creación | dab0637 posterior a 59bfc98: C05, BE-AC10, rachas y formulario ya especificados; autorización acotada de dependencia registrada.                                                                              |
-| Edición/hitos/período  | 0018a1b posterior a specs y dab0637: FE-AC04/05/06/08/10 ya existían.                                                                                                                                         |
+| Entrega                    | Evidencia en Git / evaluación                                                                                                                                                                                                                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Producto                   | 873d26f incorpora PRD/épicas/backlog antes de los cortes funcionales.                                                                                                                                                                                                                                         |
+| Primera spec/HAB-01        | ca734b6 incorpora specs y código inicial de HAB-01 juntos. Excepción histórica: aprobación en conversación, sin commit documental separado anterior. Se conserva y no se oculta.                                                                                                                              |
+| Ampliación HAB-01          | b67caa4/25d1daf posteriores; cierre explícito documentado.                                                                                                                                                                                                                                                    |
+| HAB-05                     | 1e528cb posterior a specs; se comprobó base /api en la versión anterior.                                                                                                                                                                                                                                      |
+| Meta/CRUD/progreso         | 03f8564/a6663ff posteriores a ca734b6; regularización documental y modelo coinciden en 03f8564, pero reglas del modelo/índice ya existían. No se inventa precedencia de la actualización de ese mismo commit.                                                                                                 |
+| Cliente/tokens/fechas      | db3efbe/0fedabd/59bfc98 posteriores a specs. 59bfc98 también actualiza notas; contrato civil y criterios ya estaban antes.                                                                                                                                                                                    |
+| Recuperación/visual E1     | c28df74/8904efc posteriores a specs; VIS-02 solo corte marco/biblioteca, no todo E1.                                                                                                                                                                                                                          |
+| Parser/rachas/creación     | dab0637 posterior a 59bfc98: C05, BE-AC10, rachas y formulario ya especificados; autorización acotada de dependencia registrada.                                                                                                                                                                              |
+| Edición/hitos/período      | 0018a1b posterior a specs y dab0637: FE-AC04/05/06/08/10 ya existían.                                                                                                                                                                                                                                         |
+| Cierre FE-01/VIS-02/INT-04 | 242135f incorpora los dos GET pendientes, la adaptación visual E1, sus tests y documentación de cierre. Contratos aprobados ya presentes en su padre 0018a1b; las specs solo actualizan notas de estado. Commit manual con hooks habilitados, exactamente 14 archivos revisados; árbol resultante comprobado. |
 
 No se detectan nuevas funcionalidades ajenas a E1/E2 en esos cortes. La revisión
 de nombres detecta una excepción previa de alcance: f693c5b, commit de
@@ -284,8 +293,10 @@ El archivo de entorno de ejemplo versionado también se excluyó sin leerlo.
 
 ## 9. Evidencia disponible y reproducción
 
-Código histórico en 0018a1b más correcciones de este árbol sin commit; suites
-permanentes y evidencias individuales en docs/verificaciones. Logs/capturas de
+Código, suites permanentes y evidencias de cierre versionados en 242135f;
+las pruebas citadas se ejecutaron antes de ese commit y sus resultados se
+conservan sin atribuirles una nueva ejecución. Evidencia individual en
+docs/verificaciones. Logs/capturas de
 /tmp son temporales y no se añaden al repositorio ni se prometen tras borrarlos.
 
 | Evidencia final       | Ruta local                                                                                                                                          |
@@ -343,11 +354,13 @@ test nuevo de consultas, test nuevo de formularios/historial y ajuste accesible
 del test de partida-error. Documentación: auditoría, bitácora, PRD, notas de las
 dos specs, backlog y tres evidencias de cierre. Conservarlos para revisión.
 No se recomienda preparar /tmp, .env, dependencias, builds o cambios ajenos.
-Los tres documentos que el usuario había preparado al inicio conservan sus
-blobs originales en staging; no se preparan versiones nuevas automáticamente.
+Durante la implementación se conservó el staging previo sin añadir archivos.
+Después el usuario preparó los cambios e invocó manualmente la skill commit:
+**242135f**, 14 archivos, 1268 inserciones y 253 eliminaciones. Se verificó que
+el árbol del commit coincidía exactamente con el staging revisado y que el
+árbol de trabajo quedó limpio. La skill no ejecutó git add ni git push.
 
-Mensajes sugeridos para commits separados después de revisión:
-`feat: completar consultas del servicio E2-FE-01`,
-`feat: completar vistas E1 de Nebula en E2-VIS-02` y
-`docs: cerrar tickets y consolidar aceptación de E2-INT-04`.
-No se hace staging, commit, push ni despliegue en este bloque.
+Las propuestas anteriores de commits separados quedan como planificación
+superada por esa invocación manual del usuario. Esta actualización de auditoría
+y bitácora todavía está sin preparar ni commitear; no modifica código,
+criterios, resultados de pruebas ni pendientes. No se hace push ni despliegue.
