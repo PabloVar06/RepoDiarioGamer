@@ -1,29 +1,80 @@
 /** @type {import('tailwindcss').Config} */
+const color =
+  (nombre) =>
+  ({ opacityValue }) =>
+    opacityValue === undefined
+      ? `var(--${nombre})`
+      : `color-mix(in srgb, var(--${nombre}) calc(${opacityValue} * 100%), transparent)`;
+
 module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
+        fondo: color("color-fondo"),
+        panel: color("color-panel"),
+        primario: color("color-primario"),
+        acento: color("color-acento"),
+        destacado: color("color-destacado"),
+        texto: color("color-texto"),
+        "texto-sec": color("color-texto-sec"),
+        exito: color("color-exito"),
+        error: color("color-error"),
+        borde: color("borde"),
         gamer: {
-          surface: "#2F2D2E",
-          panel: "#3A3839",
-          blue: "#3A86FF",
-          green: "#06D6A0",
-          yellow: "#FFBE0B",
-          orange: "#FB5607",
+          surface: color("legacy-gamer-surface"),
+          panel: color("legacy-gamer-panel"),
+          blue: color("legacy-gamer-blue"),
+          green: color("legacy-gamer-green"),
+          yellow: color("legacy-gamer-yellow"),
+          orange: color("legacy-gamer-orange"),
         },
       },
       boxShadow: {
-        float: "0 24px 60px rgba(0,0,0,.35)",
-        blueglow: "0 0 40px rgba(58,134,255,.28)",
-        orangeglow: "0 12px 32px rgba(251,86,7,.35)",
+        float: "var(--legacy-shadow-float)",
+        blueglow: "var(--legacy-shadow-blueglow)",
+        orangeglow: "var(--legacy-shadow-orangeglow)",
       },
       fontFamily: {
-        sans: ["Instrument Sans", "system-ui", "sans-serif"],
-        display: ["Archivo", "system-ui", "sans-serif"],
+        sans: ["var(--fuente-cuerpo)"],
+        display: ["var(--fuente-titulo)"],
+      },
+      fontSize: {
+        pantalla: [
+          "var(--texto-pantalla)",
+          {
+            lineHeight: "1.2",
+            fontWeight: "700",
+            letterSpacing: "var(--tracking-titulo)",
+          },
+        ],
+        seccion: [
+          "var(--texto-seccion)",
+          { lineHeight: "1.3", fontWeight: "400" },
+        ],
+        destacado: [
+          "var(--texto-destacado)",
+          { lineHeight: "1.5", fontWeight: "600" },
+        ],
+        cuerpo: [
+          "var(--texto-cuerpo)",
+          { lineHeight: "1.5", fontWeight: "400" },
+        ],
+        ayuda: ["var(--texto-ayuda)", { lineHeight: "1.5", fontWeight: "400" }],
+      },
+      spacing: {
+        1: "var(--espacio-1)",
+        2: "var(--espacio-2)",
+        4: "var(--espacio-4)",
+        6: "var(--espacio-6)",
+        8: "var(--espacio-8)",
+        12: "var(--espacio-12)",
       },
       borderRadius: {
-        launcher: "28px",
+        launcher: "var(--radio-contenedor)",
+        panel: "var(--radio-panel)",
+        aviso: "var(--radio-aviso)",
+        pill: "var(--radio-pildora)",
       },
     },
   },

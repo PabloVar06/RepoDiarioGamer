@@ -4,6 +4,48 @@
 
 :root {
   color-scheme: dark;
+  --color-fondo: #2b0d14;
+  --color-panel: #451520;
+  --color-primario: #f2625a;
+  --color-acento: #9b7bff;
+  --color-destacado: #f7e3a6;
+  --color-texto: #fff1ec;
+  --color-texto-sec: #d9b3b0;
+  --color-exito: #6fdb9a;
+  --color-error: #ff8a80;
+  --borde: #6b2a38;
+
+  /* Nebula requiere un recurso y licencia verificados antes de incorporarse. */
+  --fuente-titulo: "Orbitron", "Segoe UI", sans-serif;
+  --fuente-cuerpo: "Poppins", "Segoe UI", Arial, sans-serif;
+  --texto-pantalla: 2rem;
+  --texto-seccion: 1.5rem;
+  --texto-destacado: 1.125rem;
+  --texto-cuerpo: 1rem;
+  --texto-ayuda: 0.875rem;
+  --tracking-titulo: 0.04em;
+  --espacio-1: 0.25rem;
+  --espacio-2: 0.5rem;
+  --espacio-4: 1rem;
+  --espacio-6: 1.5rem;
+  --espacio-8: 2rem;
+  --espacio-12: 3rem;
+  --radio-contenedor: 28px;
+  --radio-panel: 20px;
+  --radio-aviso: 12px;
+  --radio-pildora: 999px;
+
+  /* Compatibilidad temporal: migrar las vistas en VIS-02/03, sin remapear
+     automáticamente los botones E1 de texto blanco al coral de Nebula. */
+  --legacy-gamer-surface: #2f2d2e;
+  --legacy-gamer-panel: #3a3839;
+  --legacy-gamer-blue: #3a86ff;
+  --legacy-gamer-green: #06d6a0;
+  --legacy-gamer-yellow: #ffbe0b;
+  --legacy-gamer-orange: #fb5607;
+  --legacy-shadow-float: 0 24px 60px rgba(0, 0, 0, 0.35);
+  --legacy-shadow-blueglow: 0 0 40px rgba(58, 134, 255, 0.28);
+  --legacy-shadow-orangeglow: 0 12px 32px rgba(251, 86, 7, 0.35);
 }
 
 html,
@@ -14,23 +56,33 @@ body,
 
 body {
   margin: 0;
-  background: #2f2d2e;
-  color: #fff;
-  font-family: "Instrument Sans", system-ui, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-cuerpo);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fuente-titulo);
+  letter-spacing: var(--tracking-titulo);
+  text-transform: uppercase;
 }
 
 ::selection {
-  background: #3a86ff;
-  color: #fff;
+  background: var(--color-acento);
+  color: var(--color-fondo);
 }
 
 option {
-  background: #2f2d2e;
-  color: #fff;
+  background: var(--color-panel);
+  color: var(--color-texto);
 }
 
-:focus-visible {
-  outline: 2px solid #3a86ff;
+:root body :focus-visible {
+  outline: 3px solid var(--color-acento);
   outline-offset: 3px;
 }
 

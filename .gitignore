@@ -9,3 +9,6 @@ Thumbs.db
 
 # Archivos de metadatos de macOS
 ._*
+
+# Informes de pruebas del producto
+coverage/

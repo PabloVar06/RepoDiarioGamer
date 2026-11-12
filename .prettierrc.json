@@ -1,0 +1,10 @@
+{
+  "endOfLine": "lf",
+  "proseWrap": "preserve",
+  "overrides": [
+    {
+      "files": "*.mdc",
+      "options": { "parser": "markdown" }
+    }
+  ]
+}

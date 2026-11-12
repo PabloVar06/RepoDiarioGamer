@@ -6,7 +6,7 @@ Aplicación full-stack para organizar videojuegos, registrar sesiones de juego, 
 
 - **Backend:** Node.js, Express, TypeScript, Mongoose y MongoDB Atlas. Arquitectura por capas: `routes → controllers → services → modelos`.
 - **Frontend:** React, TypeScript, Vite, React Router, Tailwind CSS y GSAP.
-- **Despliegue previsto:** backend como *Web Service* y frontend como *Static Site* en Render.
+- **Despliegue previsto:** backend como _Web Service_ y frontend como _Static Site_ en Render.
 - **Comunicación:** servicios `frontend/src/api/videojuegosApi.ts` y `partidasApi.ts`, configurados mediante `VITE_API_URL`.
 
 ```text
@@ -40,27 +40,27 @@ Aplicación full-stack para organizar videojuegos, registrar sesiones de juego, 
 
 ### Videojuego
 
-| Campo | Tipo / validación |
-|---|---|
-| `nombre` | String obligatorio, máximo 120 caracteres |
-| `plataforma` | Enum: `PC`, `PlayStation`, `Xbox`, `Switch`, `Movil` |
-| `genero` | Enum: `Accion`, `Rol`, `Estrategia`, `Puzzle`, `Deportes`, `Terror`, `Otro` |
-| `estado` | Enum: `Jugando`, `Pausado`, `Completado`, `Abandonado`; predeterminado `Jugando` |
-| `logros` | Arreglo de subdocumentos `{ _id, nombre, obtenido }`; `nombre` obligatorio y `obtenido` booleano predeterminado `false` |
-| `createdAt`, `updatedAt` | Timestamps automáticos |
+| Campo                    | Tipo / validación                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `nombre`                 | String obligatorio, máximo 120 caracteres                                                                               |
+| `plataforma`             | Enum: `PC`, `PlayStation`, `Xbox`, `Switch`, `Movil`                                                                    |
+| `genero`                 | Enum: `Accion`, `Rol`, `Estrategia`, `Puzzle`, `Deportes`, `Terror`, `Otro`                                             |
+| `estado`                 | Enum: `Jugando`, `Pausado`, `Completado`, `Abandonado`; predeterminado `Jugando`                                        |
+| `logros`                 | Arreglo de subdocumentos `{ _id, nombre, obtenido }`; `nombre` obligatorio y `obtenido` booleano predeterminado `false` |
+| `createdAt`, `updatedAt` | Timestamps automáticos                                                                                                  |
 
 **Los enums distinguen mayúsculas de minúsculas.** Usar, por ejemplo, `"Accion"` y `"Completado"`, no `"accion"` ni `"completado"`. Si existen registros antiguos con minúsculas en MongoDB Atlas, deben normalizarse; cambiar el código no modifica los documentos existentes.
 
 ### Partida
 
-| Campo | Tipo / validación |
-|---|---|
-| `videojuego` | ObjectId obligatorio, `ref: "Videojuego"` |
-| `fecha` | Date obligatorio; el modelo normaliza el día a medianoche UTC |
-| `duracionMinutos` | Number obligatorio, entre 1 y 1440 |
-| `porcentajeAvance` | Number obligatorio, entre 0 y 100 |
-| `notas` | String opcional, máximo 1000 caracteres |
-| `createdAt`, `updatedAt` | Timestamps automáticos |
+| Campo                    | Tipo / validación                                             |
+| ------------------------ | ------------------------------------------------------------- |
+| `videojuego`             | ObjectId obligatorio, `ref: "Videojuego"`                     |
+| `fecha`                  | Date obligatorio; el modelo normaliza el día a medianoche UTC |
+| `duracionMinutos`        | Number obligatorio, entre 1 y 1440                            |
+| `porcentajeAvance`       | Number obligatorio, entre 0 y 100                             |
+| `notas`                  | String opcional, máximo 1000 caracteres                       |
+| `createdAt`, `updatedAt` | Timestamps automáticos                                        |
 
 Los **logros están embebidos** porque pertenecen al juego y se consultan junto a su ficha. Las **partidas están referenciadas** porque su historial puede crecer indefinidamente y consultarse por separado.
 
@@ -68,11 +68,11 @@ Los **logros están embebidos** porque pertenecen al juego y se consultan junto 
 
 `GET /api/videojuegos/:id/resumen` se implementa en `backend/src/services/videojuegos.service.ts`:
 
-| Campo | Regla |
-|---|---|
-| `totalPartidas` | Cantidad de sesiones del videojuego |
-| `horasTotales` | Suma de `duracionMinutos` / 60, redondeada a dos decimales |
-| `ultimaPartida` | Fecha de la sesión más reciente o `null` si no hay partidas |
+| Campo                    | Regla                                                                        |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `totalPartidas`          | Cantidad de sesiones del videojuego                                          |
+| `horasTotales`           | Suma de `duracionMinutos` / 60, redondeada a dos decimales                   |
+| `ultimaPartida`          | Fecha de la sesión más reciente o `null` si no hay partidas                  |
 | `porcentajeAvanceActual` | **Mayor `porcentajeAvance` de todas las sesiones**, o `0` si no hay partidas |
 
 El porcentaje mostrado **no disminuye** si una sesión posterior registra menos avance. Cada partida conserva su porcentaje original. Al eliminar una sesión, el resumen se recalcula con las sesiones restantes.
@@ -81,20 +81,20 @@ Ejemplo: tres sesiones de 60, 90 y 30 minutos con avances 80%, 30% y 70% produce
 
 ## API REST
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/api/videojuegos?filtro=texto` | Listar y filtrar por nombre |
-| GET | `/api/videojuegos/:id` | Obtener detalle |
-| POST | `/api/videojuegos` | Crear videojuego |
-| PUT | `/api/videojuegos/:id` | Actualizar videojuego |
-| DELETE | `/api/videojuegos/:id` | Eliminar videojuego y sus partidas |
-| PATCH | `/api/videojuegos/:id/logros/:logroId` | Marcar o desmarcar un logro |
-| GET | `/api/videojuegos/:id/partidas` | Historial de un videojuego |
-| GET | `/api/videojuegos/:id/resumen` | Resumen calculado |
-| GET | `/api/partidas` | Listar partidas con `populate("videojuego")` |
-| POST | `/api/partidas` | Crear sesión validando la referencia |
-| DELETE | `/api/partidas/:id` | Eliminar una sesión |
-| GET | `/api/salud` | Verificar disponibilidad |
+| Método | Ruta                                   | Descripción                                  |
+| ------ | -------------------------------------- | -------------------------------------------- |
+| GET    | `/api/videojuegos?filtro=texto`        | Listar y filtrar por nombre                  |
+| GET    | `/api/videojuegos/:id`                 | Obtener detalle                              |
+| POST   | `/api/videojuegos`                     | Crear videojuego                             |
+| PUT    | `/api/videojuegos/:id`                 | Actualizar videojuego                        |
+| DELETE | `/api/videojuegos/:id`                 | Eliminar videojuego y sus partidas           |
+| PATCH  | `/api/videojuegos/:id/logros/:logroId` | Marcar o desmarcar un logro                  |
+| GET    | `/api/videojuegos/:id/partidas`        | Historial de un videojuego                   |
+| GET    | `/api/videojuegos/:id/resumen`         | Resumen calculado                            |
+| GET    | `/api/partidas`                        | Listar partidas con `populate("videojuego")` |
+| POST   | `/api/partidas`                        | Crear sesión validando la referencia         |
+| DELETE | `/api/partidas/:id`                    | Eliminar una sesión                          |
+| GET    | `/api/salud`                           | Verificar disponibilidad                     |
 
 ### Ejemplos
 
@@ -132,11 +132,11 @@ Actualizar logro (`PATCH /api/videojuegos/:id/logros/:logroId`):
 
 El backend utiliza los middlewares `requestId`, `logger` y `errorHandler` para registrar solicitudes y responder de forma centralizada. Los errores incluyen `requestId`.
 
-| HTTP | Caso |
-|---|---|
-| `400` | Validación de esquema o ID mal formado |
+| HTTP  | Caso                                    |
+| ----- | --------------------------------------- |
+| `400` | Validación de esquema o ID mal formado  |
 | `404` | Recurso, logro o referencia inexistente |
-| `500` | Error inesperado |
+| `500` | Error inesperado                        |
 
 ## Ejecutar localmente
 
@@ -159,11 +159,23 @@ Requisitos: Node.js 20+ y acceso a MongoDB Atlas.
    npm run dev
    ```
 
-3. En `frontend/`, crear `.env`:
+3. Configurar la base del frontend mediante `VITE_API_URL` (opcional en desarrollo):
 
    ```env
    VITE_API_URL=http://localhost:3000/api
    ```
+
+   La base debe ser una URL HTTP(S) completa terminada en `/api`. Se normalizan
+   las barras finales; los servicios añaden únicamente `/videojuegos` o `/partidas`.
+   Una base sin `/api`, con el prefijo duplicado o con una URL inválida produce
+   un error antes de enviar la petición. No debe incluir credenciales, consulta ni fragmento.
+
+   Si no se configura en desarrollo, se utiliza `/api` mediante el proxy de Vite
+   hacia `http://localhost:3000`, ya definido en `frontend/vite.config.ts`.
+   La base relativa `/api` explícita también se admite solo en desarrollo.
+   En producción la variable es obligatoria: su ausencia se informa al solicitar
+   datos, sin recurrir automáticamente a localhost. Vite incorpora la configuración
+   al compilar, por lo que cambiarla en el despliegue requiere reconstruir el frontend.
 
 4. Iniciar frontend en otra terminal:
 
@@ -186,7 +198,7 @@ Para compilar: `npm run build` en cada carpeta. Para iniciar el backend compilad
 - Detalle del juego con estado, logros embebidos, historial y resumen calculado.
 - Registro de partidas y consulta del historial general.
 - Eliminación de partidas desde la interfaz, con confirmación previa.
-- Diseño oscuro tipo *gaming launcher* con Tailwind CSS y animaciones GSAP.
+- Diseño oscuro tipo _gaming launcher_ con Tailwind CSS y animaciones GSAP.
 
 ### Nota sobre fechas (pendiente de verificar en la versión actual)
 
@@ -218,17 +230,18 @@ Estas son pruebas recomendadas, **no una certificación de que se ejecutaron**.
 - Root Directory: `frontend`
 - Build Command: `npm install && npm run build`
 - Publish Directory: `dist`
-- Variable de build: `VITE_API_URL=https://savepoint-diariogamer.onrender.com`
+- Variable de build: `VITE_API_URL=https://savepoint-diariogamer.onrender.com/api`
 - Para React Router, `public/_redirects` debe contener `/* /index.html 200`.
 
 **Estado:** configuración de despliegue documentada; no se han verificado URLs públicas de producción. Agregarlas cuando estén disponibles.
 
-## 
+##
 
 **Repositorio de Git Hub**
 https://github.com/PabloVar06/RepoDiarioGamer
 
 **Enlaces de Render**
+
 - Backend: https://savepoint-diariogamer.onrender.com
 - Frontend: https://savepoint-diariogamer-vargas.onrender.com
 
