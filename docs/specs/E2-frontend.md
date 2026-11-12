@@ -101,11 +101,12 @@ las resoluciones anteriores no se reabren por esta regularización documental.
 
 ## 4. Contratos del servicio metasApi.ts
 
-Backend es la fuente canónica de DTO y estados HTTP; la tabla siguiente DEBE
-mantenerse alineada con la sección 5 de la spec backend. Al 12 de noviembre de
-2026 existen los endpoints backend de metas/progreso; falta el de rachas. En el
-cliente solo está implementado `metasApi.progreso`; los demás métodos de esta
-tabla siguen previstos para sus tickets. App.tsx todavía no consume metasApi.
+Backend es la fuente canónica de DTO y estados HTTP; esta tabla permanece
+alineada con la sección 5 de la spec backend. En el bloque de cierre del
+12 de noviembre de 2026 están implementados y probados los siete métodos.
+DetalleVideojuego, compuesto desde App, consume progreso/rachas y las mutaciones;
+no necesita pedir activa adicionalmente. El cierre completa obtener/activa sin
+modificar rutas, payloads ni comportamiento de consultas existentes.
 
 | Método de servicio       | Contrato HTTP                       | Resultado                                      |
 | ------------------------ | ----------------------------------- | ---------------------------------------------- |
@@ -277,7 +278,7 @@ Runner de HAB-01 disponible: Vitest 3.2.6, React Testing Library/user-event y
 jsdom, como dependencias de desarrollo fijadas en package.json/lockfile y
 comprobadas con el Vite/React existente. No se incorporan librerías de UI.
 Los tests HTTP de `metasApi` con fetch simulado y fixture DTO del contrato
-siguen previstos para sus tickets E2; los de interacción verifican comportamiento,
+están implementados y ejecutados en sus tickets E2; los de interacción verifican comportamiento,
 no snapshots como única prueba.
 
 El runner DEBE usar config de test explícita con `envDir` apuntando a un directorio
@@ -290,47 +291,44 @@ es complementario. Configuración y resultados de HAB-01 constan en
 
 ## 10. Tabla ticket → archivos previstos
 
-N = nuevo y M = modificación respecto al plan original. HAB-01 está cerrado y
-HAB-05 implementado, pendiente de cierre. FE-01 y VIS-01 tienen únicamente los
-cortes técnicos acreditados abajo; el resto conserva su planificación aprobada.
-Rutas repetidas indican trabajo incremental.
+N = nuevo y M = modificación respecto al plan original. El mapa conserva
+archivos y alcance aprobados, no solo el primer corte técnico de cada ticket.
+La verificación y cierre actuales están en E2-cierre-tickets.md. Rutas repetidas
+indican trabajo incremental; no se reintroducen los IDs del borrador de 34.
 
-| Ticket                      | Archivos previstos                                                                                                                                                                                                                                                               | Alcance / evidencia                                                                                                                           |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| E2-HAB-01 (parte FE)        | M `frontend/package.json`, lockfile; N `frontend/vitest.config.ts`, `tests/setup.ts`, `tests/base.test.tsx`                                                                                                                                                                      | Runner aislado sin carga de `.env`; no configuración de pruebas escondida en build.                                                           |
-| E2-HAB-04                   | M `frontend/src/App.tsx`; N `src/utils/fechas.ts`, `src/utils/fechas.test.ts`, `tests/partidas-fecha.test.tsx`                                                                                                                                                                   | Campo fecha y formato civil en E1; no extraer todas las pantallas.                                                                            |
-| E2-HAB-05                   | N `frontend/src/api/baseUrl.ts`, `src/api/baseUrl.test.ts`; M `src/api/videojuegosApi.ts`, `src/api/partidasApi.ts`                                                                                                                                                              | Base con `/api` y fallback de desarrollo implementados en 1e528cb; cierre pendiente. Solo BASE común, sin refactor total T2; README alineado. |
-| E2-HAB-06                   | M `frontend/src/App.tsx`; N `frontend/tests/partida-error.test.tsx`                                                                                                                                                                                                              | Error de envío no desmonta formulario E1 ni borra valores.                                                                                    |
-| E2-FE-01                    | N `frontend/src/api/metasApi.ts`, `src/api/metasApi.test.ts`, `src/pages/DetalleVideojuego.tsx`, `src/hooks/useProgresoVideojuego.ts`, `src/components/ProgresoSemanal.tsx`, `src/components/EstadoCargaError.tsx`; M `src/tipos.ts`, `src/App.tsx`; N `tests/progreso.test.tsx` | DTO/metasApi inicial, carga parcial y actividad sin meta; extracción acotada de Detalle.                                                      |
-| E2-FE-02                    | N `frontend/src/components/RachasGlobales.tsx`, `tests/rachas.test.tsx`; M `src/api/metasApi.ts`, `src/hooks/useProgresoVideojuego.ts`, `src/pages/DetalleVideojuego.tsx`, `src/tipos.ts`                                                                                        | Rachas globales, ceros y ausencia de meta.                                                                                                    |
-| E2-FE-03                    | N `frontend/src/components/MetaForm.tsx`, `tests/meta-crear.test.tsx`; M `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`, `src/hooks/useProgresoVideojuego.ts`, `src/components/ProgresoSemanal.tsx`                                                                    | Crear, validar y reconsultar; no repetición de POST.                                                                                          |
-| E2-FE-04                    | M `frontend/src/components/MetaForm.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`; N `tests/meta-editar.test.tsx`                                                                                                                                               | Edición de objetivos, 409 y conservación de borrador.                                                                                         |
-| E2-FE-05                    | N `frontend/src/components/ConfirmarDesactivacion.tsx`, `tests/meta-desactivar.test.tsx`; M `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`                                                                                                                             | Confirmación accesible, DELETE/204 y reconsulta.                                                                                              |
-| E2-FE-06                    | N `frontend/src/components/HitosEditor.tsx`, `src/components/HitosLista.tsx`, `tests/hitos.test.tsx`; M `src/components/MetaForm.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/tipos.ts`                                                                                         | Hasta 5 hitos, IDs estables y estados calculados.                                                                                             |
-| E2-INT-01 (parte FE)        | M `frontend/src/App.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/hooks/useProgresoVideojuego.ts`; N `tests/reconsulta.test.tsx`                                                                                                                                                 | Registro/eliminación y navegación E1; refrescar cada indicador desde su entrega.                                                              |
-| E2-INT-03 (parte FE)        | M `frontend/src/hooks/useProgresoVideojuego.ts`; N `tests/cambio-periodo.test.tsx`                                                                                                                                                                                               | P06 aprobado; no introducir cron ni polling.                                                                                                  |
-| E2-VIS-01                   | M `frontend/src/index.css`, `frontend/tailwind.config.cjs`; M `frontend/index.html` solo si se aprueba un recurso/licencia de fuente; N `tests/tokens.test.ts`                                                                                                                   | Tokens y tipografía; el test de tokens no sustituye evidencia de contraste real.                                                              |
-| E2-VIS-02                   | M `frontend/src/App.tsx`, `src/index.css` y componentes E1 si el corte aprobado los requiere                                                                                                                                                                                     | Exclusivamente P-VIS aprobado: no reorganización general ni resolución incidental D1/D2.                                                      |
-| E2-VIS-03                   | M `frontend/src/pages/DetalleVideojuego.tsx`, `src/components/ProgresoSemanal.tsx`, `RachasGlobales.tsx`, `MetaForm.tsx`, `HitosEditor.tsx`, `HitosLista.tsx`, `ConfirmarDesactivacion.tsx`                                                                                      | Adopción visual E2 conservando comportamiento funcional.                                                                                      |
-| E2-INT-04 (parte FE/visual) | N/M `frontend/tests/*.test.tsx` de los tickets previos; documentación de evidencia en `docs/`                                                                                                                                                                                    | Matriz AC01–AC13 por criterios, vistas y bloques; no snapshots como única evidencia.                                                          |
+| Ticket                      | Archivos previstos                                                                                                                                                                                                                                                               | Alcance / evidencia                                                                                                                                                   |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| E2-HAB-01 (parte FE)        | M `frontend/package.json`, lockfile; N `frontend/vitest.config.ts`, `tests/setup.ts`, `tests/base.test.tsx`                                                                                                                                                                      | Runner aislado sin carga de `.env`; no configuración de pruebas escondida en build.                                                                                   |
+| E2-HAB-04                   | M `frontend/src/App.tsx`; N `src/utils/fechas.ts`, `src/utils/fechas.test.ts`, `tests/partidas-fecha.test.tsx`                                                                                                                                                                   | Campo fecha y formato civil en E1; no extraer todas las pantallas.                                                                                                    |
+| E2-HAB-05                   | N `frontend/src/api/baseUrl.ts`, `src/api/baseUrl.test.ts`; M `src/api/videojuegosApi.ts`, `src/api/partidasApi.ts`                                                                                                                                                              | Base con `/api` y fallback de desarrollo implementados en 1e528cb; cierre consolidado en el bloque aprobado. Solo BASE común, sin refactor total T2; README alineado. |
+| E2-HAB-06                   | M `frontend/src/App.tsx`; N `frontend/tests/partida-error.test.tsx`                                                                                                                                                                                                              | Error de envío no desmonta formulario E1 ni borra valores.                                                                                                            |
+| E2-FE-01                    | N `frontend/src/api/metasApi.ts`, `src/api/metasApi.test.ts`, `src/pages/DetalleVideojuego.tsx`, `src/hooks/useProgresoVideojuego.ts`, `src/components/ProgresoSemanal.tsx`, `src/components/EstadoCargaError.tsx`; M `src/tipos.ts`, `src/App.tsx`; N `tests/progreso.test.tsx` | DTO/metasApi inicial, carga parcial y actividad sin meta; extracción acotada de Detalle.                                                                              |
+| E2-FE-02                    | N `frontend/src/components/RachasGlobales.tsx`, `tests/rachas.test.tsx`; M `src/api/metasApi.ts`, `src/hooks/useProgresoVideojuego.ts`, `src/pages/DetalleVideojuego.tsx`, `src/tipos.ts`                                                                                        | Rachas globales, ceros y ausencia de meta.                                                                                                                            |
+| E2-FE-03                    | N `frontend/src/components/MetaForm.tsx`, `tests/meta-crear.test.tsx`; M `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`, `src/hooks/useProgresoVideojuego.ts`, `src/components/ProgresoSemanal.tsx`                                                                    | Crear, validar y reconsultar; no repetición de POST.                                                                                                                  |
+| E2-FE-04                    | M `frontend/src/components/MetaForm.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`; N `tests/meta-editar.test.tsx`                                                                                                                                               | Edición de objetivos, 409 y conservación de borrador.                                                                                                                 |
+| E2-FE-05                    | N `frontend/src/components/ConfirmarDesactivacion.tsx`, `tests/meta-desactivar.test.tsx`; M `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`                                                                                                                             | Confirmación accesible, DELETE/204 y reconsulta.                                                                                                                      |
+| E2-FE-06                    | N `frontend/src/components/HitosEditor.tsx`, `src/components/HitosLista.tsx`, `tests/hitos.test.tsx`; M `src/components/MetaForm.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/tipos.ts`                                                                                         | Hasta 5 hitos, IDs estables y estados calculados.                                                                                                                     |
+| E2-INT-01 (parte FE)        | M `frontend/src/App.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/hooks/useProgresoVideojuego.ts`; N `tests/reconsulta.test.tsx`                                                                                                                                                 | Registro/eliminación y navegación E1; refrescar cada indicador desde su entrega.                                                                                      |
+| E2-INT-03 (parte FE)        | M `frontend/src/hooks/useProgresoVideojuego.ts`; N `tests/cambio-periodo.test.tsx`                                                                                                                                                                                               | P06 aprobado; no introducir cron ni polling.                                                                                                                          |
+| E2-VIS-01                   | M `frontend/src/index.css`, `frontend/tailwind.config.cjs`; M `frontend/index.html` solo si se aprueba un recurso/licencia de fuente; N `tests/tokens.test.ts`                                                                                                                   | Tokens y tipografía; el test de tokens no sustituye evidencia de contraste real.                                                                                      |
+| E2-VIS-02                   | M `frontend/src/App.tsx`, `src/index.css` y componentes E1 si el corte aprobado los requiere                                                                                                                                                                                     | Exclusivamente P-VIS aprobado: no reorganización general ni resolución incidental D1/D2.                                                                              |
+| E2-VIS-03                   | M `frontend/src/pages/DetalleVideojuego.tsx`, `src/components/ProgresoSemanal.tsx`, `RachasGlobales.tsx`, `MetaForm.tsx`, `HitosEditor.tsx`, `HitosLista.tsx`, `ConfirmarDesactivacion.tsx`                                                                                      | Adopción visual E2 conservando comportamiento funcional.                                                                                                              |
+| E2-INT-04 (parte FE/visual) | N/M `frontend/tests/*.test.tsx` de los tickets previos; documentación de evidencia en `docs/`                                                                                                                                                                                    | Matriz AC01–AC13 por criterios, vistas y bloques; no snapshots como única evidencia.                                                                                  |
 
 Las tablas backend/frontend cubren conjuntamente los 23 IDs vigentes; los IDs
 agrupados del borrador de 34 no se reintroducen como tickets nuevos.
-La resolución de BASE descrita en la sección 4 está implementada y verificada en
-HAB-05 (1e528cb), pendiente de cierre; la validación se realiza al solicitar datos,
-según el plan aprobado y su evidencia. Esta nota de estado no cambia el contrato.
-La creación inicial de metasApi.ts corresponde a FE-01, no a HAB-05. Los métodos
-se incorporan progresivamente en los cortes FE posteriores, reutilizando baseUrl.ts.
-El [corte técnico FE-01](../verificaciones/E2-FE-01-servicio.md) acredita tipos,
-GET de progreso, validación de DTO, errores y cancelación del cliente; no crea
-componentes, hooks ni integración con Detalle. La
-[base VIS-01](../verificaciones/E2-VIS-01.md) acredita tokens/reglas globales y
-verificación de navegador limitada; no acredita VIS-02/03 ni carga de las fuentes
-previstas. Las clases antiguas de App.tsx todavía cubren gran parte del tema.
-El [estado consolidado](../verificaciones/E2-estado-implementacion.md) distingue
-esas pruebas técnicas de la aceptación UI que continúa pendiente.
-El [backlog](../backlog/E2-metas-y-rachas.md#14-matriz-de-trazabilidad-y-verificación)
-relaciona decisiones, historias, AC, tickets y método de verificación.
+HAB-05 comparte solo BASE; no resuelve toda T2. FE-01 dispone ahora del panel,
+hook y siete métodos de metasApi, incluidos obtener/activa, con pruebas de
+contratos/cancelación y estados. Sus primeros servicios aislados no acreditaban
+la interfaz; se completa esa evidencia en los cortes posteriores.
+
+VIS-01 acredita tokens y fallbacks aprobados; no incorpora fuentes sin licencia.
+VIS-02 completa las vistas E1 del alcance P-VIS, y VIS-03 consolida detalle,
+metas/hitos/diálogo. Se conservan las deudas de comportamiento E1 explícitamente
+diferidas; no se confunde el cierre visual con resolver T4 o D1/D2/D3.
+La evidencia individual, matriz y límites vigentes están en
+[E2-cierre-tickets](../verificaciones/E2-cierre-tickets.md),
+[auditoría](../AUDITORIA.md) y [backlog](../backlog/E2-metas-y-rachas.md).
 
 ## 11. Restricciones y aprobación
 
@@ -348,7 +346,8 @@ relaciona decisiones, historias, AC, tickets y método de verificación.
 aprobados». Los cambios posteriores de contratos o decisiones requieren nueva
 aprobación y el plan de cada ticket delimita la implementación autorizada.
 
-**Evidencia actual:** runners y pruebas básicas de E1 documentados en
-[E2-HAB-01](../verificaciones/E2-HAB-01.md) y resolución de base API verificada en
-[E2-HAB-05](../verificaciones/E2-HAB-05.md), pendiente de cierre. Esto no acredita
-componentes E2 ni adopción visual de Nebula Arcade, que corresponden a otros tickets.
+**Evidencia actual:** [HAB-01](../verificaciones/E2-HAB-01.md),
+[HAB-05](../verificaciones/E2-HAB-05.md), componentes y cierre de tickets en
+[E2-cierre-tickets](../verificaciones/E2-cierre-tickets.md). Las mediciones de
+Nebula y las matrices de criterios están en [AUDITORIA.md](../AUDITORIA.md).
+Esta actualización cambia solo notas de estado; no reglas ni criterios aprobados.

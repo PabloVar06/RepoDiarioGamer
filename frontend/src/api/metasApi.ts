@@ -182,7 +182,9 @@ async function solicitar<T>(
   }
   const accion =
     tipo === "meta"
-      ? "guardar la meta"
+      ? datos === undefined && metodo === undefined
+        ? "consultar la meta"
+        : "guardar la meta"
       : tipo === "rachas"
         ? "consultar las rachas"
         : "consultar el progreso";
@@ -238,6 +240,34 @@ async function solicitar<T>(
 }
 
 export const metasApi = {
+  obtener(metaId: string, signal?: AbortSignal): Promise<MetaDTO> {
+    return solicitar(
+      `/metas/${encodeURIComponent(metaId)}`,
+      "meta",
+      200,
+      (valor): valor is MetaDTO =>
+        meta(valor) && valor._id.toLowerCase() === metaId.toLowerCase(),
+      signal,
+    );
+  },
+  activa(
+    videojuegoId: string,
+    signal?: AbortSignal,
+  ): Promise<{ meta: MetaDTO | null }> {
+    return solicitar(
+      `/videojuegos/${encodeURIComponent(videojuegoId)}/meta`,
+      "meta",
+      200,
+      (valor): valor is { meta: MetaDTO | null } =>
+        objeto(valor) &&
+        (valor.meta === null ||
+          (meta(valor.meta) &&
+            valor.meta.activa &&
+            valor.meta.videojuego.toLowerCase() ===
+              videojuegoId.toLowerCase())),
+      signal,
+    );
+  },
   desactivar(metaId: string): Promise<void> {
     return solicitar(
       `/metas/${encodeURIComponent(metaId)}`,

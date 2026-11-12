@@ -23,8 +23,9 @@ la aprobación documental no acredita implementación ni cierre.
   [backlog, secciones 13–15](../backlog/E2-metas-y-rachas.md#13-estado-actual-y-siguiente-paso).
 - Revisión de implementación del 12 de noviembre de 2026:
   [estado comprobado y plan incremental](../verificaciones/E2-estado-implementacion.md).
-  El backend de metas/progreso y la base técnica frontend tienen evidencia parcial;
-  los componentes E2 y la adaptación completa de las vistas siguen pendientes.
+  Esa revisión es histórica. Los componentes E2 y la adaptación visual del
+  alcance P-VIS se verifican en el [cierre posterior](../verificaciones/E2-cierre-tickets.md),
+  sin modificar las decisiones de este PRD.
 
 No se encontró una ficha de hechos independiente ni la lista académica original
 de ocho huecos. H1–H8 son los identificadores de trabajo discutidos y aprobados
@@ -53,8 +54,9 @@ ver rachas globales calculadas de forma consistente con las fechas locales.
 La métrica de aceptación propuesta para la entrega es **100 % de los escenarios
 de aceptación acordados ejecutados y aprobados, y ninguna regresión detectada
 en E1 dentro de la suite definida**. Se registrarán casos aprobados/ejecutados,
-fallos y limitaciones. Este objetivo todavía no está verificado: los tests del
-harness no son pruebas del producto. No se introduce telemetría ni se promete
+fallos y limitaciones. La verificación actual del alcance acordado está en
+[AUDITORIA.md](../AUDITORIA.md); conserva PA01 y los límites explícitos. Los tests
+del harness no son pruebas del producto. No se introduce telemetría ni se promete
 una mejora cuantificada de hábitos sin datos de uso.
 
 ## Alcance: distinguir E1 de E2
