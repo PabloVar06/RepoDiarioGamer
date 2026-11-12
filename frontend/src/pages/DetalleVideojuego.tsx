@@ -3,13 +3,14 @@ import { Link, useParams } from "react-router-dom";
 import { videojuegosApi } from "../api/videojuegosApi";
 import { partidasApi } from "../api/partidasApi";
 import { metasApi } from "../api/metasApi";
-import type { Partida, Resumen, Videojuego } from "../tipos";
+import type { MetaDTO, Partida, Resumen, Videojuego } from "../tipos";
 import { formatearFechaCivil } from "../utils/fechas";
 import { useIndicadoresVideojuego } from "../hooks/useProgresoVideojuego";
 import { EstadoCargaError } from "../components/EstadoCargaError";
 import { ProgresoSemanal } from "../components/ProgresoSemanal";
 import { RachasGlobales } from "../components/RachasGlobales";
 import { MetaForm } from "../components/MetaForm";
+import { ConfirmarDesactivacion } from "../components/ConfirmarDesactivacion";
 
 const secundaria =
   "inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento";
@@ -23,8 +24,15 @@ function DetalleDelJuego({ id }: { id: string }) {
   const [r, setR] = useState<Resumen | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [formularioMeta, setFormularioMeta] = useState(false);
+  const [formularioMeta, setFormularioMeta] = useState<
+    "crear" | MetaDTO | null
+  >(null);
   const numero = useRef(0);
+  const volver = useRef<HTMLAnchorElement>(null);
+  const [desactivacion, setDesactivacion] = useState<{
+    id: string;
+    disparador: HTMLButtonElement;
+  } | null>(null);
   const indicadores = useIndicadoresVideojuego(id);
   const { progreso, rachas } = indicadores;
   const cargar = useCallback(async () => {
@@ -77,7 +85,7 @@ function DetalleDelJuego({ id }: { id: string }) {
   }
   return (
     <div className="space-y-12 text-cuerpo">
-      <Link className={secundaria} to="/">
+      <Link ref={volver} className={secundaria} to="/">
         ← Volver a la biblioteca
       </Link>
       <EstadoCargaError
@@ -152,7 +160,23 @@ function DetalleDelJuego({ id }: { id: string }) {
                   <ProgresoSemanal
                     datos={progreso.datos}
                     onCrearMeta={
-                      formularioMeta ? undefined : () => setFormularioMeta(true)
+                      formularioMeta
+                        ? undefined
+                        : () => setFormularioMeta("crear")
+                    }
+                    onEditarMeta={
+                      !formularioMeta && progreso.datos.meta
+                        ? () => setFormularioMeta(progreso.datos!.meta!)
+                        : undefined
+                    }
+                    onDesactivarMeta={
+                      !formularioMeta && progreso.datos.meta
+                        ? (disparador) =>
+                            setDesactivacion({
+                              id: progreso.datos!.meta!._id,
+                              disparador,
+                            })
+                        : undefined
                     }
                   />
                 )}
@@ -169,9 +193,33 @@ function DetalleDelJuego({ id }: { id: string }) {
           {formularioMeta && (
             <MetaForm
               videojuegoId={id}
-              guardar={metasApi.crear}
+              metaInicial={
+                formularioMeta === "crear" ? undefined : formularioMeta
+              }
+              guardar={
+                formularioMeta === "crear"
+                  ? metasApi.crear
+                  : (datos) =>
+                      metasApi.actualizar(formularioMeta._id, {
+                        minutosObjetivo: datos.minutosObjetivo,
+                        diasPorSemana: datos.diasPorSemana,
+                        ...(datos.hitos === undefined
+                          ? {}
+                          : { hitos: datos.hitos }),
+                      })
+              }
               consultar={progreso.recargar}
-              onCancelar={() => setFormularioMeta(false)}
+              onCancelar={() => setFormularioMeta(null)}
+            />
+          )}
+          {desactivacion && (
+            <ConfirmarDesactivacion
+              metaId={desactivacion.id}
+              disparador={desactivacion.disparador}
+              desactivar={metasApi.desactivar}
+              consultar={progreso.recargar}
+              onCerrar={() => setDesactivacion(null)}
+              focoAlternativo={() => volver.current}
             />
           )}
           <div className="grid gap-6 lg:grid-cols-2">

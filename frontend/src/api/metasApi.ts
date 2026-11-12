@@ -1,6 +1,7 @@
 import type {
   CrearMeta,
   DetalleErrorApi,
+  EditarMeta,
   HitoDTO,
   MetaDTO,
   ProgresoJuegoDTO,
@@ -166,6 +167,7 @@ async function solicitar<T>(
   validar: (valor: unknown) => valor is T,
   signal?: AbortSignal,
   datos?: unknown,
+  metodo?: "PUT" | "DELETE",
 ): Promise<T> {
   comprobarCancelacion(signal);
   let base: string;
@@ -187,7 +189,7 @@ async function solicitar<T>(
   let respuesta: Response;
   try {
     respuesta = await fetch(`${base}${ruta}`, {
-      method: datos === undefined ? "GET" : "POST",
+      method: metodo ?? (datos === undefined ? "GET" : "POST"),
       headers: {
         Accept: "application/json",
         ...(datos === undefined ? {} : { "Content-Type": "application/json" }),
@@ -236,6 +238,31 @@ async function solicitar<T>(
 }
 
 export const metasApi = {
+  desactivar(metaId: string): Promise<void> {
+    return solicitar(
+      `/metas/${encodeURIComponent(metaId)}`,
+      "meta",
+      204,
+      (valor): valor is undefined => valor === undefined,
+      undefined,
+      undefined,
+      "DELETE",
+    );
+  },
+  actualizar(metaId: string, datos: EditarMeta): Promise<MetaDTO> {
+    return solicitar(
+      `/metas/${encodeURIComponent(metaId)}`,
+      "meta",
+      200,
+      (valor): valor is MetaDTO =>
+        meta(valor) &&
+        valor.activa &&
+        valor._id.toLowerCase() === metaId.toLowerCase(),
+      undefined,
+      datos,
+      "PUT",
+    );
+  },
   crear(datos: CrearMeta): Promise<MetaDTO> {
     return solicitar(
       "/metas",
