@@ -1,10 +1,10 @@
 # Spec E2 — Backend de metas, progreso y rachas
 
-Fecha: 11 de noviembre de 2026. Estado: **borrador NO aprobado**.
+Fecha de redacción: 11 de noviembre de 2026. Estado: **aprobada por el usuario en conversación**.
 
-Se autoriza redactar esta spec, no implementar. H1–H9 y la planificación están
-aprobados; los contratos y resoluciones propuestos aquí necesitan aprobación
-explícita. Los DEBE/NO DEBE describen la implementación futura, no su estado actual.
+Aprobación registrada: «Si esta bien los specs estan aprobados». Se conservan
+H1–H9, reglas, contratos, criterios y decisiones aprobadas. La ejecución requiere
+además un plan aprobado para cada ticket; aprobar esta spec no acredita su implementación.
 
 Fuentes: [AGENTS.md](../../AGENTS.md), [DESIGN.md](../../DESIGN.md),
 [PRD](../prd/savepoint.md), [épicas](../backlog/epicas.md),
@@ -26,7 +26,10 @@ No incluye autenticación, edición de partidas, informes históricos de metas,
 reactivación, cron, notificaciones, gráficos, tienda, descargas o rankings.
 No se reescriben fechas antiguas ni se resuelve toda la deuda del diagnóstico.
 
-## 2. Contradicciones, diferencias y propuestas por aprobar
+## 2. Registro de contradicciones, diferencias y propuestas previo a la aprobación
+
+Se conserva el análisis original siguiente como antecedente. Sus referencias
+a aprobación pendiente describen la redacción inicial, no el estado actual de esta spec.
 
 | ID  | Evidencia / diferencia                                                                                                                                | Propuesta y condición de aprobación                                                                                                                                         |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -226,17 +229,21 @@ NO se simula que la garantía existe con un test exclusivamente mockeado.
 
 ## 9. Tests, criterios y verificaciones
 
-Propuesta de infraestructura: `node:test` con soporte TypeScript de `tsx` ya
-presente para unitarios; tests HTTP con aplicación aislada y MongoDB local
-descartable para integración. No depende de Atlas ni de credenciales privadas.
-El runner debe recibir una base de pruebas explícita y única; solo limpia esa
-base y nunca infiere la de desarrollo/producción. La disponibilidad de MongoDB
-descartable es requisito del runner, no algo que esta redacción haya probado.
+Infraestructura de HAB-01 disponible: `node:test` con soporte TypeScript de `tsx`
+para pruebas sin persistencia; HTTP real con MongoDB local temporal mediante
+`mongodb-memory-server-core` 10.2.3 y binario fijado 7.0.24 para integración.
+El runner genera explícitamente una base única y solo utiliza el proceso propio
+en 127.0.0.1. Verifica su identidad y limpia su temporal, sin inferir una base de
+desarrollo/producción ni recurrir a Atlas o credenciales privadas.
 
-Para impedir carga indirecta de dotenv, proponer `crearApp(configuracion)` sin
-importación de `config/env.ts`; el punto de entrada de producción entrega la
-configuración. Los tests no importan `index.ts` ni ejecutan el servidor productivo.
-Este cambio pertenece a HAB-01/T5 y NO se implementa en esta tarea.
+El aislamiento imprescindible de HAB-01/T5 está implementado mediante
+`crearApp({ frontendUrl })`, sin importación de `config/env.ts`; el punto de entrada
+de producción entrega la configuración. Los tests no importan `index.ts` ni
+ejecutan el servidor productivo. El preload real es `backend/tests/setup.cjs`,
+con un preload adicional para integración en `tests/integration/preload.cjs`.
+Los resultados ejecutados constan en [la evidencia de HAB-01](../verificaciones/E2-HAB-01.md).
+La tabla siguiente conserva los criterios funcionales E2, que requieren pruebas
+en sus propios tickets; disponer del runner no los da por cumplidos.
 
 | ID      | DADO / CUANDO / ENTONCES                                                                                                                                     | Verificación futura                                                                   |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
@@ -256,18 +263,18 @@ Debe añadirse cobertura de año bisiesto, cambio de año, domingo/lunes, múlti
 inactivas, ID de hito ajeno/repetido, [] frente a omisión de hitos y orden de
 respuestas. AC13 requiere regresión de E1; los tests del harness no la sustituyen.
 
-Comandos de cierre previstos, aún inexistentes hasta HAB-01: `npm run test:unit`
-y `npm run test:integration` en backend; `tsc --noEmit` es complementario. Su
-implementación y scripts no se afirman presentes ni ejecutados hoy.
+Comandos disponibles en backend: `npm test` / `npm run test:unit`,
+`npm run test:integration` y `npm run typecheck`. Este último comprueba la aplicación
+y las pruebas sin emitir archivos; es complementario a los tests funcionales.
 
 ## 10. Tabla ticket → archivos previstos
 
-N = nuevo, M = modificar, durante la implementación aprobada. Solo las rutas
-de pruebas/configuración son propuestas; no se crean archivos de aplicación ahora.
+N = nuevo, M = modificar, respecto al plan original. La parte de HAB-01 ya tiene
+implementación y evidencia; las filas restantes mantienen su planificación aprobada.
 
 | Ticket                 | Archivos previstos                                                                                                                                                                                                                                                                                                                                                                    | Alcance / evidencia                                                                         |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| E2-HAB-01 (parte BE)   | M `backend/package.json`, lockfile, `src/app.ts`, `src/index.ts`; N `backend/tests/setup.ts`, `tests/app.test.ts`                                                                                                                                                                                                                                                                     | Runner, app inyectable y datos aislados; mantener `config/env.ts` fuera del grafo de tests. |
+| E2-HAB-01 (parte BE)   | M `backend/package.json`, lockfile, `src/app.ts`, `src/index.ts`; N `backend/tests/setup.cjs`, `tests/app.test.ts`                                                                                                                                                                                                                                                                    | Runner, app inyectable y datos aislados; mantener `config/env.ts` fuera del grafo de tests. |
 | E2-HAB-03              | M `backend/src/modelos/Partida.model.ts`, `src/services/partidas.service.ts`; N `src/services/fechas.ts`, `tests/fechas.test.ts`                                                                                                                                                                                                                                                      | B1 y P02/P07 si se aprueban.                                                                |
 | E2-BE-01               | N `backend/src/services/progreso.calculos.ts`, `src/services/progreso.service.ts`, `src/controllers/progreso.controller.ts`, `tests/progreso.test.ts`; M `src/routes/videojuegos.routes.ts`                                                                                                                                                                                           | Actividad semanal sin meta.                                                                 |
 | E2-BE-02               | N `backend/src/services/rachas.calculos.ts`, `src/services/rachas.service.ts`, `src/controllers/rachas.controller.ts`, `src/routes/rachas.routes.ts`, `tests/rachas.test.ts`; M `src/app.ts`                                                                                                                                                                                          | Consulta global con reloj explícito.                                                        |
@@ -283,6 +290,10 @@ T3 adelantado de C05 afecta `backend/src/app.ts` y `src/middlewares/errorHandler
 en los tickets HAB-01/BE-03 con evidencia HTTP; su alcance debe registrarse, no
 ocultarse como parte del formato. El resto de T1–T5/D1–D3 sigue pendiente.
 
+Estado de HAB-01: por instrucción posterior explícita del usuario, T3 se mantiene
+pendiente. La integración caracteriza el JSON malformado como 500 sin requestId,
+sin corregirlo ni dar por cumplido el contrato futuro de errores E2.
+
 ## 11. Restricciones y aprobación
 
 - NO escribir código, instalar dependencias ni ejecutar DB al redactar esta spec.
@@ -294,9 +305,10 @@ ocultarse como parte del formato. El resto de T1–T5/D1–D3 sigue pendiente.
 - DEBE ejecutar tests pertinentes y revisar criterios/ticket/archivos antes del cierre.
 - NO hacer staging, commit, push ni despliegue sin instrucción independiente.
 
-**Aprobación: pendiente.** Revisar C01–C06 y P02/P03/P04/P05/P07 junto con P06 y
-alcance visual de la spec frontend. Si se cambia una resolución, actualizar los
-dos contratos afectados y solicitar aprobación antes de programar.
+**Aprobación:** registrada en la conversación mediante «Si esta bien los specs estan
+aprobados». Si se cambia una resolución, actualizar los dos contratos afectados
+y solicitar aprobación antes de programar.
 
-**Evidencia actual:** únicamente redacción y revisión documental. Las pruebas
-anteriores son verificaciones exigidas para la implementación futura, no ejecutadas.
+**Evidencia actual:** infraestructura y regresiones E1 verificadas en
+[E2-HAB-01](../verificaciones/E2-HAB-01.md). Los criterios funcionales de E2
+anteriores siguen vinculados a sus tickets y no se consideran ejecutados por HAB-01.

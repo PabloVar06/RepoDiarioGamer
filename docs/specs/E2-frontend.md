@@ -1,10 +1,10 @@
 # Spec E2 — Frontend e integración visual de SAVEPOINT
 
-Fecha: 11 de noviembre de 2026. Estado: **borrador NO aprobado**.
+Fecha de redacción: 11 de noviembre de 2026. Estado: **aprobada por el usuario en conversación**.
 
-La aprobación del PRD/backlog no aprueba todavía esta spec ni permite programar.
-Las reglas DEBE/NO DEBE se refieren a una futura implementación. Se conservan
-las decisiones H1–H9; las propuestas P y el alcance visual requieren aprobación.
+Aprobación registrada: «Si esta bien los specs estan aprobados». Se conservan
+H1–H9, reglas, contratos, criterios y decisiones aprobadas. La ejecución requiere
+además un plan aprobado para cada ticket; aprobar esta spec no acredita su implementación.
 
 Fuentes: [AGENTS.md](../../AGENTS.md), [DESIGN.md](../../DESIGN.md),
 [PRD](../prd/savepoint.md), [épicas](../backlog/epicas.md),
@@ -26,7 +26,10 @@ No añade seguimiento automático, formularios de hora de inicio/fin, edición d
 partidas, reactivación de metas, vista histórica, nuevas bibliotecas UI, tienda,
 descargas, rankings, notificaciones ni gráficos históricos.
 
-## 2. Contradicciones y decisiones antes de aprobación
+## 2. Registro de contradicciones y decisiones previo a la aprobación
+
+Se conserva el análisis original siguiente como antecedente. Sus referencias
+a aprobación pendiente describen la redacción inicial, no el estado actual de esta spec.
 
 | ID    | Diferencia detectada                                                                                                           | Tratamiento propuesto                                                                                                                                          |
 | ----- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -254,22 +257,26 @@ tokens es implementación visual y NO se realiza al redactar esta spec.
 | FE-AC11 | DADO vistas incluidas en el corte visual aprobado, CUANDO uso móvil, escritorio, teclado o movimiento reducido, ENTONCES cumple DESIGN.md sin cambiar funciones de E1.        | AC13 visual; evidencia por vista, contraste, foco, estados y tamaño de controles. |
 | FE-AC12 | DADO carga parcial o guardado confirmado con GET fallido, CUANDO se informa, ENTONCES no desaparecen E1/formularios ni se duplica la escritura; se ofrece reintentar lectura. | Tests de estados independientes y respuesta 500/no JSON.                          |
 
-Propuesta de runner: Vitest, React Testing Library/user-event y entorno DOM de
-pruebas, como dependencias de desarrollo, no librerías de UI. Confirmar versiones
-compatibles con Vite/React actuales antes de instalar; no se fijan versiones
-inventadas en esta spec. Tests HTTP de `metasApi` con fetch simulado y fixture DTO
-del contrato; los de interacción verifican comportamiento, no snapshots como única prueba.
+Runner de HAB-01 disponible: Vitest 3.2.6, React Testing Library/user-event y
+jsdom, como dependencias de desarrollo fijadas en package.json/lockfile y
+comprobadas con el Vite/React existente. No se incorporan librerías de UI.
+Los tests HTTP de `metasApi` con fetch simulado y fixture DTO del contrato
+siguen previstos para sus tickets E2; los de interacción verifican comportamiento,
+no snapshots como única prueba.
 
 El runner DEBE usar config de test explícita con `envDir` apuntando a un directorio
 temporal vacío y sin imports del config de desarrollo. No cargar `.env` reales
 ni ejecutar build/dev para probar. La base de API se inyecta como valor sintético.
-Proponer `npm run test` y `npm run test:coverage` en frontend tras HAB-01; no existen
-ni se han ejecutado por redactar este documento. Typecheck es complementario.
+Comandos disponibles en frontend: `npm test`, `npm run test:coverage` y
+`npm run typecheck`. Typecheck comprueba aplicación y pruebas sin emitir archivos;
+es complementario. Configuración y resultados de HAB-01 constan en
+[su evidencia](../verificaciones/E2-HAB-01.md).
 
 ## 10. Tabla ticket → archivos previstos
 
-N = nuevo y M = modificación futura. Los paths concretos ayudan a acotar alcance;
-no implican que esos archivos ya existan. Rutas repetidas indican trabajo incremental.
+N = nuevo y M = modificación respecto al plan original. HAB-01 ya dispone de
+infraestructura y evidencia; las demás filas conservan su planificación aprobada.
+Rutas repetidas indican trabajo incremental.
 
 | Ticket                      | Archivos previstos                                                                                                                                                                                                                                                               | Alcance / evidencia                                                                                                                           |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -305,9 +312,10 @@ agrupados del borrador de 34 no se reintroducen como tickets nuevos.
   además del diseño de las vistas incluidas, antes de cerrar tickets.
 - NO hacer staging, commit, push o despliegue sin instrucción independiente.
 
-**Aprobación: pendiente.** Revisar F-C01–F-C08 y P05/P06/P-VIS junto con las
-propuestas backend. Esta spec no debe aprobarse como implementable con decisiones
-críticas sin resolver. Puede aprobarse por cortes, identificando los PA que no afectan.
+**Aprobación:** registrada en la conversación mediante «Si esta bien los specs estan
+aprobados». Los cambios posteriores de contratos o decisiones requieren nueva
+aprobación y el plan de cada ticket delimita la implementación autorizada.
 
-**Evidencia actual:** solo revisión documental. No se ejecutaron las pruebas de
-producto propuestas ni se aplicó el nuevo diseño al frontend.
+**Evidencia actual:** runners y pruebas básicas de E1 documentados en
+[E2-HAB-01](../verificaciones/E2-HAB-01.md). Esto no acredita implementación de
+componentes E2 ni adopción visual de Nebula Arcade, que corresponden a otros tickets.

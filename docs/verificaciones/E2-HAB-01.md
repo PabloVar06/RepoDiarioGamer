@@ -2,9 +2,12 @@
 
 Fecha: 11 de noviembre de 2026, America/Guayaquil.
 
-Estado: base de pruebas y verificación CRUD local implementadas y verificadas;
-pendiente de revisión y autorización de cierre del usuario. En esta ampliación
-no se realizó staging, commit ni push. No se avanzó a HAB-03/04 ni a tickets visuales.
+Estado: **cerrado con aprobación explícita del usuario**, tras verificar la base
+de pruebas, el CRUD local y los estados frontend incluidos en HAB-01.
+Autorización registrada en conversación: «Esta bien puedes cerrarlo, aprobado».
+Las entregas previas corresponden a ca734b6 (base) y b67caa4 (CRUD local).
+En el complemento actual no se realizó staging, commit ni push.
+No se avanzó a HAB-03/04 ni a tickets visuales.
 
 ## Alcance autorizado
 
@@ -200,9 +203,9 @@ de sesiones se verificó mediante los dos listados implementados.
 | Detener instancia y limpiar datos                                         | Verificado: stop del proceso propio, PID inexistente (ESRCH), borrado exclusivo del mkdtemp y stat posterior ENOENT. |
 | Tests y TypeScript                                                        | Pasan; detalle de comandos debajo.                                                                                   |
 | JSON malformado conforme al contrato futuro                               | Pendiente T3, expresamente excluido de corrección en esta ampliación.                                                |
-| Cierre de E2-HAB-01                                                       | Pendiente revisión y aprobación del usuario; no se declara cerrado.                                                  |
+| Cierre de E2-HAB-01                                                       | Cerrado con aprobación explícita del usuario tras completar la evidencia del DoD.                                    |
 
-### Reproducción y resultados actuales
+### Reproducción y resultados de la ampliación CRUD
 
 Desde backend:
 
@@ -212,7 +215,7 @@ npm run test:integration
 npm run typecheck
 ```
 
-Desde frontend, sin modificar archivos:
+Desde frontend, sin modificar archivos en aquella ampliación:
 
 ```sh
 npm test
@@ -247,9 +250,137 @@ T3, D1–D3 y las demás deudas del diagnóstico permanecen pendientes.
 - Modificados: backend/package.json, backend/package-lock.json y este documento.
 - Nuevos: backend/tests/integration-safety.test.ts y, bajo tests/integration/,
   preload.cjs, safety.ts, temporary-mongo.ts y e1-crud.test.ts.
-- Sin cambios en backend/src, frontend ni otros tickets. No se prepararon
-  archivos en staging, no se hizo commit ni push.
+- Sin cambios en backend/src ni frontend en la ampliación CRUD. Esa evidencia
+  se registró antes del commit b67caa4, solicitado posteriormente por el usuario.
 
-Mensaje de commit sugerido, sin ejecutarlo:
+## Complemento aprobado: estados frontend y coherencia documental
 
-`test: habilitar pruebas aisladas para E2-HAB-01`
+El usuario aprobó el CRUD y mantuvo HAB-01 abierto hasta completar su DoD.
+Después aprobó el plan de cinco pruebas frontend y correcciones de referencias
+en las dos specs, antes de modificar archivos. Se ejecutó únicamente ese plan.
+
+### Pruebas añadidas y regresiones
+
+Se amplió frontend/tests/base.test.tsx, utilizando App y servicios existentes.
+Las llamadas a listar se simulan dentro del test; no se cambian componentes,
+servicios, estilos, dependencias ni comportamiento de E1. Las promesas de carga
+se mantienen pendientes hasta comprobar la interfaz y se resuelven explícitamente.
+
+| ID de evidencia | Escenario                      | Verificación real                                                                                                                                                                                                                                                             | Resultado final |
+| --------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| HAB01-FE01      | Carga de videojuegos           | Con la API pendiente muestra Cargando datos…, sin vacío ni tarjetas; al resolver aparecen videojuegos y desaparece carga.                                                                                                                                                     | Pasa.           |
+| HAB01-FE02      | Carga de partidas              | Con la API pendiente muestra carga y no vacío; al resolver muestra sesión y enlace a su videojuego.                                                                                                                                                                           | Pasa.           |
+| HAB01-FE03      | Biblioteca vacía               | La API responde []; muestra el mensaje vacío sin carga ni tarjetas de videojuegos.                                                                                                                                                                                            | Pasa.           |
+| HAB01-FE04      | Historial vacío                | La API responde []; muestra vacío sin carga ni botones de eliminar y conserva el enlace Nueva partida.                                                                                                                                                                        | Pasa.           |
+| HAB01-FE05      | Recuperación tras error de API | La primera consulta falla; escribir Hades en el filtro existente provoca la segunda consulta. Durante ella desaparece el error y aparece carga; al resolver se muestran resultados, conservando filtro y mismo elemento DOM, sin remontar la interfaz. Dos llamadas en total. | Pasa.           |
+
+La prueba previa de error de carga sigue comprobando que un fallo no se anuncia
+como biblioteca vacía. Se conservan las regresiones de biblioteca, filtro,
+cliente HTTP, eliminación 204 y protección de lecturas del entorno.
+Esta recuperación verifica la biblioteca mediante el filtro existente; no
+resuelve B4 ni acredita recuperación del formulario de partidas de HAB-06.
+
+Primera ejecución dirigida: **7 pasaron y 1 falló** en base.test.tsx. El selector
+buscaba las notas como texto exacto, pero la interfaz las concatena con la fecha.
+Se corrigió únicamente el selector del test para buscar el contenido de las notas.
+No se cambió la aplicación ni se detectó un fallo de producto en estos escenarios.
+
+### Correcciones documentales y conservación de contratos
+
+- E2-backend.md y E2-frontend.md registran la aprobación ya existente mediante
+  «Si esta bien los specs estan aprobados», sin inventar una fecha de aprobación.
+- El análisis de contradicciones inicial se conserva identificado como antecedente.
+  Se actualizan referencias a runners, comandos disponibles, setup.cjs y evidencia.
+- Se diferencia infraestructura HAB-01 ya verificada de criterios funcionales E2
+  todavía asignados a otros tickets. Se aclara que T3 sigue pendiente en HAB-01.
+- Comparación automática contra HEAD: secciones 3–8 de ambas specs (reglas y
+  contratos), filas BE-AC/FE-AC y filas de decisiones C/F-C/P conservan su contenido,
+  normalizando únicamente espacios. No se modificaron reglas ni criterios aprobados.
+
+### Ejecución final y aislamiento confirmado
+
+Ejecución del 11/11/2026 aproximadamente 21:58 en Ecuador
+(12/11/2026 02:58 UTC en logs backend).
+
+```sh
+# frontend
+npm run test:coverage
+npm run typecheck
+
+# backend
+npm test
+npm run test:integration
+npm run typecheck
+
+# raíz
+python3 -B -m unittest discover -s tests/harness -v
+```
+
+test:coverage ejecuta la suite frontend completa, incluidas las cinco pruebas
+nuevas y las regresiones previas. TypeScript comprueba aplicación y tests en
+ambos proyectos mediante tsc --noEmit y tsconfig.test.json.
+
+| Suite o comprobación                                      | Pasaron | Fallaron | Omitidas |
+| --------------------------------------------------------- | ------- | -------- | -------- |
+| Backend base                                              | 21      | 0        | 0        |
+| Integración HTTP con MongoDB temporal                     | 53      | 0        | 0        |
+| Frontend: 8 de interfaz, 3 del cliente y 2 de aislamiento | 13      | 0        | 0        |
+| Harness                                                   | 23      | 0        | 0        |
+| Total reportado por los runners                           | 110     | 0        | 0        |
+
+Integración conserva el desglose de 9 escenarios principales y 44 subpruebas,
+incluida una caracterización de T3. Las pruebas iniciales fallidas no se suman
+a esta ejecución final. TypeScript backend/frontend termina con código 0.
+
+Cobertura frontend de líneas: **44,66 %**, frente a **36,16 %** en la base inicial.
+No se exige ni se inventa un umbral; este porcentaje no certifica todo E1/E2.
+Persisten los avisos de futura migración React Router v7, sin ocultarlos ni
+cambiar versiones o comportamiento para eliminarlos.
+
+MongoDB volvió a iniciarse exclusivamente mediante el runner local aprobado,
+con controles de identidad antes del CRUD y antes de las peticiones:
+
+```text
+version=7.0.24; host=127.0.0.1; port=64785; pid=70238
+dbName=savepoint_e1_test_3a3f656a493f414b8ef85c8a66ca316d
+dbPath=<tmp>/savepoint-e1-LzA7I7/data
+E1 aislamiento: MongoDB detenido; directorio temporal y datos eliminados.
+tests 53; pass 53; fail 0; cancelled 0; skipped 0
+```
+
+Se confirmó además, de forma independiente tras la suite, PID 70238 inexistente
+(ESRCH) y directorio temporal eliminado. No se utilizó Atlas ni se leyeron,
+modificaron o mostraron archivos .env. El binario reutilizado permanece en la
+caché ignorada de node_modules; los datos del nuevo proceso se eliminaron.
+
+### Cumplimiento de Definition of Done
+
+Evaluación limitada al corte aprobado de HAB-01 y a su ampliación de regresión
+CRUD. No acredita criterios funcionales E2 ni resolución de deudas ajenas.
+
+| Requisito del backlog                                                                                  | Estado técnico          | Evidencia                                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------ | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DoD particular: prueba reproducible por capa, comandos y aislamiento sin entorno privado               | Cumplido                | Runners backend/frontend, pruebas de guards, MongoDB propio y comandos/resultados registrados.                                                                          |
+| DoD común 1: alcance aprobado y arquitectura/contratos E1 conservados                                  | Cumplido                | Solo un archivo de tests y tres documentos en este complemento; backend/src y frontend/src sin cambios. Reglas, criterios y decisiones de specs comparados contra HEAD. |
+| DoD común 2: tests pertinentes, límites, errores y regresiones con datos aislados                      | Cumplido                | 110 resultados aprobados, 0 fallos y 0 omitidos en la ejecución final; CRUD, validaciones, fixtures y comprobaciones de aislamiento.                                    |
+| DoD común 3: backend según el corte y frontend con interacción, carga/error/vacío/éxito y recuperación | Cumplido                | CRUD E1 y errores 400/404; cinco pruebas nuevas HAB01-FE01–05 más las regresiones anteriores de interacción y error.                                                    |
+| DoD común 4: evidencia visual                                                                          | No aplica a este ticket | No se modifican componentes o estilos ni se implementa un corte visual.                                                                                                 |
+| DoD común 5: diff acotado, sin secretos y documentación coherente                                      | Cumplido                | Cuatro archivos previstos; encabezados/referencias corregidos; revisión del diff y formato Prettier sin errores.                                                        |
+| DoD común 6: resultado presentado para revisión                                                        | Cumplido                | Informe y tabla del DoD entregados al usuario; staging, commit y push no realizados en este complemento.                                                                |
+| Autorización de cierre                                                                                 | Aprobada por el usuario | Cierre autorizado explícitamente tras revisar el informe final y el DoD.                                                                                                |
+
+**T3 sigue pendiente:** JSON malformado devuelve 500 sin requestId. El test
+caracteriza el defecto y no lo convierte en comportamiento aprobado de E2.
+Las limitaciones de navegador real, atomicidad, concurrencia, rendimiento y
+fechas de otros tickets siguen vigentes. No quedan sin evidencia los tres
+escenarios frontend solicitados dentro del alcance acordado.
+
+Archivos modificados en este complemento:
+
+- frontend/tests/base.test.tsx.
+- docs/specs/E2-backend.md.
+- docs/specs/E2-frontend.md.
+- docs/verificaciones/E2-HAB-01.md.
+
+No se añadieron archivos ni dependencias. No se modificó código de aplicación,
+no se avanzó a otro ticket y no se realizó staging, commit ni push.
