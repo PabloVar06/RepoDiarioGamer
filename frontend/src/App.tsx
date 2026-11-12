@@ -28,10 +28,10 @@ const generos = [
 const estados = ["Jugando", "Pausado", "Completado", "Abandonado"];
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center rounded-xl px-3 py-2.5 text-sm font-semibold transition ${
+  `flex min-h-11 items-center rounded-aviso border-2 px-4 py-2 text-cuerpo transition-colors ${
     isActive
-      ? "bg-white/10 text-white shadow-blueglow"
-      : "text-white/55 hover:bg-white/5 hover:text-white"
+      ? "border-acento bg-panel text-texto"
+      : "border-transparent text-texto-sec hover:bg-panel hover:text-texto"
   }`;
 
 function pillClass(estado: string) {
@@ -46,18 +46,21 @@ function pillClass(estado: string) {
 
 function Layout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-gamer-surface p-3 text-white md:p-5">
-      <div className="mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1580px] gap-4 md:min-h-[calc(100vh-2.5rem)]">
-        <aside className="hidden w-56 shrink-0 flex-col md:flex">
+    <div className="min-h-screen bg-fondo p-2 text-texto md:p-4">
+      <div className="mx-auto flex min-h-[calc(100vh-1rem)] max-w-[1580px] gap-4 md:min-h-[calc(100vh-2rem)]">
+        <aside className="hidden w-56 shrink-0 flex-col gap-6 md:flex">
           <Link
             to="/"
-            className="mb-8 font-display text-2xl font-black tracking-tight"
+            className="inline-flex min-h-11 items-center font-display text-seccion"
           >
-            SAVE<span className="text-gamer-orange">POINT</span>
+            SAVE<span className="text-primario">POINT</span>
           </Link>
-          <nav className="flex flex-col gap-1">
-            <p className="mb-2 px-3 text-[11px] font-bold uppercase tracking-[0.18em] text-gamer-yellow">
-              Launcher
+          <nav
+            aria-label="Navegación principal"
+            className="flex flex-col gap-2"
+          >
+            <p className="px-4 text-ayuda font-semibold uppercase tracking-wide text-texto-sec">
+              Navegación
             </p>
             <NavLink to="/" end className={navClass}>
               Videojuegos
@@ -65,44 +68,44 @@ function Layout({ children }: { children: ReactNode }) {
             <NavLink to="/partidas" className={navClass}>
               Partidas
             </NavLink>
-            <NavLink
-              to="/videojuegos/nuevo"
-              className="mt-3 flex items-center rounded-xl bg-gamer-orange px-3 py-2.5 text-sm font-semibold text-white shadow-orangeglow transition hover:brightness-110"
-            >
+            <NavLink to="/videojuegos/nuevo" className={navClass}>
               + Añadir juego
             </NavLink>
           </nav>
-          <div className="mt-auto rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="font-display text-xs font-extrabold uppercase tracking-wider text-white/90">
-              Diario de progreso gamer
-            </p>
-            <p className="mt-1 text-xs text-white/50">
+          <div className="mt-auto rounded-panel border border-borde bg-panel p-6">
+            <p className="text-cuerpo">Diario de progreso gamer</p>
+            <p className="mt-2 text-ayuda text-texto-sec">
               Tu aventura, tus estadísticas.
             </p>
           </div>
         </aside>
-
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-launcher border border-white/10 bg-[#262425] shadow-float">
-          <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 md:hidden">
-            <Link to="/" className="font-display text-lg font-black">
-              SAVE<span className="text-gamer-orange">POINT</span>
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-launcher border border-borde bg-fondo">
+          <header className="flex flex-col gap-4 border-b border-borde p-4 md:hidden">
+            <Link
+              to="/"
+              className="inline-flex min-h-11 items-center self-start font-display text-seccion"
+            >
+              SAVE<span className="text-primario">POINT</span>
             </Link>
-            <nav className="flex items-center gap-2 text-xs font-semibold">
-              <Link to="/" className="text-white/70">
+            <nav
+              aria-label="Navegación móvil"
+              className="grid grid-cols-2 gap-2"
+            >
+              <NavLink to="/" end className={navClass}>
                 Videojuegos
-              </Link>
-              <Link to="/partidas" className="text-white/70">
+              </NavLink>
+              <NavLink to="/partidas" className={navClass}>
                 Partidas
-              </Link>
-              <Link
+              </NavLink>
+              <NavLink
                 to="/videojuegos/nuevo"
-                className="rounded-lg bg-gamer-orange px-2.5 py-1.5 text-white"
+                className={(state) => `${navClass(state)} col-span-2`}
               >
-                + Añadir
-              </Link>
+                + Añadir juego
+              </NavLink>
             </nav>
           </header>
-          <main className="flex-1 overflow-y-auto p-5 md:p-8">{children}</main>
+          <main className="min-w-0 flex-1 p-4 sm:p-6 md:p-8">{children}</main>
         </div>
       </div>
     </div>
@@ -113,11 +116,53 @@ function Estados({
   loading,
   error,
   empty,
+  nebula = false,
+  reintentar,
 }: {
   loading: boolean;
   error: string;
   empty: boolean;
+  nebula?: boolean;
+  reintentar?: () => void;
 }) {
+  if (nebula) {
+    const aviso = "rounded-aviso border border-borde bg-panel p-4 text-cuerpo";
+    if (loading)
+      return (
+        <p role="status" className={`${aviso} text-texto-sec`}>
+          Cargando datos…
+        </p>
+      );
+    if (error)
+      return (
+        <div role="alert" className={`${aviso} space-y-4 text-error`}>
+          <p>{error}</p>
+          {reintentar && (
+            <button
+              type="button"
+              onClick={reintentar}
+              className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
+            >
+              Reintentar
+            </button>
+          )}
+        </div>
+      );
+    if (empty)
+      return (
+        <div role="status" className={`${aviso} space-y-4 text-texto-sec`}>
+          <p>Todavía no hay datos. ¡Añade el primero!</p>
+          <p>Puedes añadir un videojuego o ajustar la búsqueda.</p>
+          <Link
+            to="/videojuegos/nuevo"
+            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
+          >
+            Añadir videojuego
+          </Link>
+        </div>
+      );
+    return null;
+  }
   if (loading)
     return (
       <p className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/60">
@@ -168,90 +213,101 @@ function ListaJuegos() {
   }
   return (
     <>
-      <div className="mb-6">
-        <input
-          aria-label="Filtrar videojuegos"
-          placeholder="Buscar por nombre…"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-          className="w-full rounded-full border border-white/10 bg-black/25 px-5 py-3 text-sm text-white outline-none placeholder:text-white/40 focus:border-gamer-blue focus:shadow-blueglow"
-        />
-      </div>
-      <section className="hero relative mb-10 overflow-hidden rounded-launcher border border-white/10 bg-gradient-to-br from-[#4a3a32] via-gamer-surface to-[#1e2a44] p-8 shadow-float md:p-12">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_18%,rgba(58,134,255,.35),transparent_36%),radial-gradient(circle_at_12%_88%,rgba(251,86,7,.22),transparent_42%)]" />
-        <div className="relative max-w-xl">
-          <p className="eyebrow mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
+      <section className="hero mb-12 rounded-launcher border border-borde bg-panel p-6 md:p-8">
+        <div className="max-w-xl">
+          <p className="eyebrow mb-4 text-ayuda font-semibold uppercase tracking-wide text-[color:var(--color-destacado)]">
             TU COLECCIÓN · TU HISTORIA
           </p>
-          <h1 className="font-display text-4xl font-black leading-[0.95] tracking-tight md:text-6xl">
+          <h1 className="font-display text-pantalla">
             Tu próxima partida
             <br />
-            <em className="not-italic text-gamer-orange">empieza aquí.</em>
+            <em className="not-italic text-primario">empieza aquí.</em>
           </h1>
-          <p className="mt-4 max-w-md text-sm text-white/70 md:text-base">
+          <p className="mt-4 text-cuerpo text-texto-sec">
             Registra tus sesiones, sigue tu progreso y celebra cada logro.
           </p>
           <Link
             to="/videojuegos/nuevo"
-            className="button mt-6 inline-flex rounded-full bg-gamer-orange px-5 py-2.5 text-sm font-bold shadow-orangeglow transition hover:brightness-110"
+            className="button mt-6 inline-flex min-h-11 items-center justify-center rounded-pill bg-primario px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-fondo"
           >
             + Añadir juego
           </Link>
         </div>
       </section>
-      <div className="sectionhead mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="sectionhead mb-6 space-y-6">
         <div>
-          <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
+          <p className="eyebrow text-ayuda font-semibold uppercase tracking-wide text-[color:var(--color-destacado)]">
             BIBLIOTECA
           </p>
-          <h2 className="font-display text-2xl font-extrabold">
-            Mis videojuegos
-          </h2>
+          <h2 className="mt-2 font-display text-seccion">Mis videojuegos</h2>
+        </div>
+        <div>
+          <label
+            htmlFor="filtro-videojuegos"
+            className="mb-2 block text-cuerpo"
+          >
+            Filtrar videojuegos
+          </label>
+          <input
+            id="filtro-videojuegos"
+            placeholder="Buscar por nombre…"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+            className="min-h-11 w-full rounded-pill border border-borde bg-panel px-6 py-2 text-cuerpo text-texto outline-none placeholder:text-texto-sec focus:border-acento"
+          />
         </div>
       </div>
       <Estados
         loading={loading}
         error={error}
         empty={!loading && !error && !items.length}
+        nebula
+        reintentar={cargar}
       />
-      <div className="cards grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="cards grid grid-cols-1 gap-6 lg:grid-cols-2 2xl:grid-cols-3">
         {items.map((j) => (
           <article
-            className="gamecard overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-float"
+            className="gamecard min-w-0 rounded-panel border border-borde bg-panel p-6"
             key={j._id}
           >
-            <div className="gamecover relative flex aspect-[16/10] items-end bg-gradient-to-br from-gamer-blue/70 via-[#3a3839] to-gamer-surface p-4">
-              <span className="absolute left-4 top-4 font-display text-5xl font-black text-white/90">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <span
+                aria-hidden="true"
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-aviso bg-fondo font-display text-seccion text-primario"
+              >
                 {j.nombre.slice(0, 1).toUpperCase()}
               </span>
-              <small className="rounded-full bg-black/35 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
-                {j.plataforma}
-              </small>
+              <span className="inline-flex rounded-pill border border-borde bg-fondo px-4 py-2 text-ayuda text-[color:var(--color-destacado)]">
+                {j.estado}
+              </span>
             </div>
-            <div className="gameinfo space-y-2 p-4">
-              <span className={pillClass(j.estado)}>{j.estado}</span>
-              <h3 className="font-display text-lg font-extrabold leading-tight">
+            <div className="gameinfo mt-6 space-y-4">
+              <h3 className="break-words font-display text-seccion">
                 {j.nombre}
               </h3>
-              <p className="text-sm text-white/55">
-                {j.genero} · {j.logros.filter((l) => l.obtenido).length}/
-                {j.logros.length} logros
+              <p className="text-ayuda text-texto-sec">
+                {j.plataforma} · {j.genero}
               </p>
-              <div className="actions flex flex-wrap items-center gap-3 pt-1">
+              <p className="text-ayuda text-texto-sec">
+                {j.logros.filter((l) => l.obtenido).length}/{j.logros.length}{" "}
+                logros
+              </p>
+              <div className="actions flex flex-wrap items-center gap-2 pt-2">
                 <Link
-                  className="button rounded-full bg-gamer-orange px-3 py-1.5 text-xs font-bold shadow-orangeglow"
+                  className="button inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
                   to={`/videojuegos/${j._id}`}
                 >
                   Ver progreso ↗
                 </Link>
                 <Link
-                  className="text-sm font-semibold text-gamer-blue"
+                  className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
                   to={`/videojuegos/${j._id}/editar`}
                 >
                   Editar
                 </Link>
                 <button
-                  className="text-sm font-semibold text-gamer-yellow hover:text-gamer-orange"
+                  type="button"
+                  className="inline-flex min-h-11 items-center justify-center rounded-pill border border-error px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-error"
                   onClick={() => borrar(j._id)}
                 >
                   Eliminar
