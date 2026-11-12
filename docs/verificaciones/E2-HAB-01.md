@@ -5,8 +5,9 @@ Fecha: 11 de noviembre de 2026, America/Guayaquil.
 Estado: **cerrado con aprobación explícita del usuario**, tras verificar la base
 de pruebas, el CRUD local y los estados frontend incluidos en HAB-01.
 Autorización registrada en conversación: «Esta bien puedes cerrarlo, aprobado».
-Las entregas previas corresponden a ca734b6 (base) y b67caa4 (CRUD local).
-En el complemento actual no se realizó staging, commit ni push.
+Las entregas corresponden a ca734b6 (base), b67caa4 (CRUD local) y 25d1daf
+(estados frontend y cierre). La regularización documental posterior no hizo
+staging, commit ni push y no cambia ese cierre.
 No se avanzó a HAB-03/04 ni a tickets visuales.
 
 ## Alcance autorizado
@@ -384,3 +385,24 @@ Archivos modificados en este complemento:
 
 No se añadieron archivos ni dependencias. No se modificó código de aplicación,
 no se avanzó a otro ticket y no se realizó staging, commit ni push.
+
+## Regularización de trazabilidad SDD
+
+El usuario aprobó el plan de regularización documental mediante «Plan aprobado».
+Se conserva el cierre explícito de HAB-01 y todos los resultados anteriores.
+No se volvieron a ejecutar tests del producto para esta modificación documental.
+
+Las specs E2-backend.md y E2-frontend.md se incorporaron por primera vez a Git
+**en ca734b6, el mismo commit que el código/configuración/tests iniciales de HAB-01**.
+Su padre no contenía docs/specs/. La aprobación previa en conversación no equivale
+a disponer de un commit documental previo: se registra esta excepción histórica
+sin inventar precedencia, reescribir Git ni rehacer el trabajo aceptado.
+
+Las ampliaciones b67caa4 y 25d1daf son posteriores a las specs. Para los próximos
+cortes, la versión aplicable de la spec y sus correcciones aprobadas deberán
+estar versionadas antes del código correspondiente, con autorización independiente
+para el commit. La cronología y la matriz de aceptación están en el
+[backlog, secciones 14–15](../backlog/E2-metas-y-rachas.md#14-matriz-de-trazabilidad-y-verificación).
+
+Esta regularización no cambia reglas H1–H9, resultados de pruebas, código ni
+contratos. T3 continúa pendiente; su caracterización no cumple BE-AC10.

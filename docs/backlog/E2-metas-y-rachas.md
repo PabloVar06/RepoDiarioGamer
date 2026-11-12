@@ -6,9 +6,11 @@ Estado: planificación y simplificación aprobadas en conversación el 11 de
 noviembre de 2026, mediante «Si esta bien, aprobado», después de revisar las
 conclusiones del borrador. Se pasa de 34 a 23 tickets con trazabilidad de los
 agrupados. El [PRD](../prd/savepoint.md) y las [épicas](epicas.md) están aprobados.
-Los puntos abiertos no quedan resueltos por esta aprobación; tampoco se autoriza
-implementar sin futuras specs aprobadas. Este documento no define rutas,
-esquemas ni implementaciones; no se crean especificaciones ni código en esta fase.
+Las specs backend/frontend fueron aprobadas después mediante «Si esta bien los
+specs estan aprobados» y están versionadas. PA02–PA07 se resuelven en ellas;
+PA01 conserva el cotejo académico externo pendiente. Cada ticket necesita además
+su plan aprobado. Este backlog no sustituye los contratos de las specs ni acredita
+implementación por sí solo; sus estados actuales y la trazabilidad están en las secciones 13–15.
 
 Referencias: [diagnóstico](../diagnostico.md), [DESIGN.md](../../DESIGN.md).
 H1–H9, AC01–AC13 y PA01–PA07 remiten al PRD. E1-01–E1-05 y E2-01–E2-06
@@ -128,7 +130,7 @@ Reglas: H6/H8. PRD: AC09/AC11. Épica: E2-01.
 - **DADO** un fallo al desactivar, **CUANDO** veo el error, **ENTONCES** no se
   presenta como exitosa la operación y puedo reintentar.
 
-No incorpora reactivación ni una pantalla de metas históricas; PA03 sigue abierto.
+No incorpora reactivación ni una pantalla de metas históricas, conforme a PA03 resuelto en la spec backend aprobada.
 
 ### HU06 — Consultar hitos alcanzados por mi avance
 
@@ -148,7 +150,7 @@ Reglas: H5/H7. PRD: AC07/AC10. Épica: E2-04.
 - **DADO** un sexto hito o un porcentaje fuera de rango, **CUANDO** intento
   guardar, **ENTONCES** se rechaza sin alterar los logros manuales de E1.
 
-La validación de enteros, duplicados y longitud de descripción requiere PA04.
+La validación de enteros, duplicados y longitud de descripción sigue PA04 de la spec backend aprobada.
 
 ### HU07 — Ver indicadores consistentes después de cambiar mis partidas
 
@@ -173,15 +175,15 @@ Reglas: H1–H4/H6–H8. PRD: AC06/AC10/AC13. Épicas: E2-02/03/04/06.
   aplica el comportamiento de actualización que se acuerde en PA06,
   **ENTONCES** presenta valores del periodo vigente sin añadir notificaciones.
 
-El último criterio queda condicionado a resolver PA06, no da por aprobada una
-frecuencia de actualización ni un mecanismo técnico.
+El último criterio se verifica con P06 de la spec frontend aprobada y corresponde
+a INT-03. No se introduce otra frecuencia o mecanismo por esta regularización.
 
 ## 3. Historias de actualización visual
 
-HV01–HV03 expresan objetivos de presentación y calidad. No se consideran tres
-entregas independientes completamente estimables mientras no se delimiten sus
-vistas. La accesibilidad y la correcta interpretación de indicadores se exigen
-ya en las historias funcionales; renovar todas las vistas de E1 es otro alcance.
+HV01–HV03 expresan objetivos de presentación y calidad. Sus entregas se acotan
+por las vistas y cortes descritos en la spec frontend aprobada y por el plan de
+cada ticket. La accesibilidad y la interpretación de indicadores se exigen ya en
+las historias funcionales; renovar las vistas E1 se limita a P-VIS, sin ampliarlo.
 
 ### HV01 — Leer la información con una identidad visual consistente
 
@@ -229,11 +231,12 @@ de UI. No se cambia el nombre SAVEPOINT por Nebula Arcade.
   editar, desactivar y gestionar hitos tienen aceptación separada. Comparten
   infraestructura, pero no forman una única entrega indivisible.
 - **Negociables:** estas historias describen resultados; rutas, persistencia,
-  componentes y mecanismos de actualización se decidirán en specs posteriores.
+  componentes y actualización están precisados en las specs aprobadas. Un cambio
+  posterior de decisiones o contratos requiere aprobación, no se infiere del backlog.
 - **Valiosas:** cada historia entrega un resultado observable para la persona;
   los habilitantes técnicos se identifican como tickets, no como historias ficticias.
-- **Estimables:** reglas y ejemplos delimitan trabajo. Los tickets afectados
-  por PA tienen estado Bloqueado por decisión; se estimarán tras resolverla.
+- **Estimables:** reglas y ejemplos delimitan trabajo. Las referencias a PA ya
+  resueltos no bloquean por sí mismas los tickets; se consulta su estado vigente.
   No se inventan horas, fechas ni puntos para requisitos todavía ambiguos.
 - **Pequeñas:** se separan consulta sin meta, rachas, creación, edición,
   desactivación e hitos. Backend y frontend son tareas de una entrega vertical,
@@ -273,16 +276,22 @@ Resolverlas no requiere escribir una spec ni ejecutar tests del producto:
 requiere registrar el acuerdo explícito. Cada spec solo queda bloqueada por los
 puntos que afectan a su alcance, no por toda esta lista.
 
-| Punto abierto     | Decisión pendiente                                                                  | Alcance que afecta                                                                             |
-| ----------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| PA01              | Contrastar con la ficha de hechos y el enunciado original cuando estén disponibles. | Conformidad académica; no se inventa una correspondencia.                                      |
-| PA02              | Fechas futuras y límites de registro retroactivo.                                   | Contrato de partidas, semana y rachas.                                                         |
-| PA03              | Metas inactivas, posible reactivación y tratamiento al borrar un juego.             | Ciclo de vida de metas y borrado; reactivar no está autorizado todavía.                        |
-| PA04              | Enteros/decimales de hitos, duplicados y longitud de descripción.                   | Validación y formularios de hitos.                                                             |
-| PA05              | Entrada de horas con incrementos de un minuto y presentación/redondeo.              | Metas e indicadores; no condiciona una racha expresada en días enteros.                        |
-| PA06              | Política de actualización con pantalla abierta al cambiar día/semana.               | INT-03 y su interfaz; no impide consultas correctas al cargar una vista.                       |
-| PA07              | Tratamiento de registros antiguos con posible desfase, sin migración silenciosa.    | Datos existentes; no convierte una migración en requisito de la corrección de entradas nuevas. |
-| Alcance visual E1 | Confirmar vistas y profundidad de navegación, biblioteca, formularios e historial.  | VIS-02 queda reservado, sin incorporar ese rediseño al cierre funcional obligatorio de E2.     |
+| Referencia        | Estado / resolución                                                                                      | Alcance que afecta                                                                |
+| ----------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| PA01              | Pendiente: contrastar con la ficha original cuando esté disponible; sin inventar equivalencia con H1–H8. | Conformidad académica; no es un bloqueo técnico global.                           |
+| PA02              | Resuelto en P02 backend aprobado.                                                                        | Fechas futuras y límites de registro retroactivo.                                 |
+| PA03              | Resuelto en P03 backend aprobado.                                                                        | Inactivas, ausencia de reactivación y cascada al borrar un juego.                 |
+| PA04              | Resuelto en P04 backend aprobado.                                                                        | Enteros, duplicados e identidad/longitud de hitos.                                |
+| PA05              | Resuelto en P05 backend/frontend aprobado.                                                               | Minutos canónicos, entrada y presentación de objetivos/indicadores.               |
+| PA06              | Resuelto en P06 frontend aprobado.                                                                       | Reconsulta al cambio de día/foco/visibilidad; implementación pendiente en INT-03. |
+| PA07              | Resuelto en P07 backend aprobado.                                                                        | Interpretación de fechas antiguas sin migración.                                  |
+| Alcance visual E1 | P-VIS descrito en la spec frontend aprobada; ejecución pendiente de plan por ticket/vista.               | VIS-02 conserva exclusivamente ese corte, sin ampliar funciones de E1.            |
+
+El [PRD](../prd/savepoint.md#estado-consolidado-de-decisiones-pa) consolida las
+resoluciones y sus fuentes canónicas. Las condiciones de decisión citadas en las
+tablas originales siguientes se interpretan conforme a este estado vigente: las
+referencias a PA02–PA07 y a delimitar P-VIS no significan que sigan sin resolución.
+Se conservan IDs, dependencias y condiciones funcionales del DoD de los 23 tickets.
 
 Tipos de ticket: `test`, `fix`, `feat`, `visual`. Las dependencias son para
 integración/cierre; pueden prepararse pruebas con datos simulados bajo spec.
@@ -333,8 +342,8 @@ existir; la renovación visual de todas las vistas E1 no bloquea su bloque funci
 
 ## 10. Tickets de integración visual de SAVEPOINT
 
-Dirección visual aprobada; ejecución sujeta a spec de frontend. Los objetivos
-visuales no autorizan ampliar lógica, datos ni contratos de E1/E2.
+Dirección y spec frontend aprobadas; ejecución sujeta al plan de cada ticket/vista.
+Los objetivos visuales no autorizan ampliar lógica, datos ni contratos de E1/E2.
 
 | ID        | Tipo   | Historia       | Corte                                                                  | Dependencias                                          | DoD particular además del común                                                                                                                                                          |
 | --------- | ------ | -------------- | ---------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -370,7 +379,7 @@ Quedan 5 habilitantes, 6 backend, 6 frontend, 3 de integración/evidencia y
    con su backend, interfaz mínima accesible y pruebas correspondientes.
 3. Entregar HU03 sin hitos; después HU04 y HU05 como cortes separados.
 4. Entregar HU06; verificar HU07 en cada corte. Registro y eliminación se
-   integran por etapas y el cambio de periodo espera la decisión PA06.
+   integran por etapas y el cambio de periodo sigue P06 aprobado en INT-03.
 5. Adoptar VIS por corte una vez aprobada la spec; puede acompañar cada interfaz
    o revisarse después, conservando reglas funcionales y accesibilidad desde el inicio.
 6. Consolidar evidencia funcional y visual. Pedir revisión antes de cualquier commit.
@@ -399,14 +408,74 @@ permiten negociar el orden sin alterar las reglas H1–H9.
 Los detalles y evidencia permanecen en el diagnóstico. Una reclasificación debe
 ser explícita y aprobada; ningún problema diferido se borra por terminar E2.
 
-## 13. Estado y siguiente paso
+## 13. Estado actual y siguiente paso
 
-El desglose simplificado está aprobado como planificación; los tickets afectados
-por PA siguen bloqueados por la decisión concreta y todos esperan su spec antes
-de implementar. VIS-02 sigue reservado hasta precisar alcance visual E1. No se
-ha ejecutado ningún ticket ni creado código o specs al actualizar este documento.
+| Tickets vigentes                                           | Estado real                                                                          | Evidencia / requisito pendiente                                                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| E2-HAB-01                                                  | Cerrado con aprobación explícita del usuario.                                        | ca734b6, b67caa4 y 25d1daf; [evidencia](../verificaciones/E2-HAB-01.md).                          |
+| E2-HAB-05                                                  | Implementado y verificado; cierre pendiente del usuario.                             | 1e528cb; [evidencia](../verificaciones/E2-HAB-05.md). El commit no sustituye el cierre.           |
+| E2-HAB-03, E2-HAB-04, E2-HAB-06                            | Pendientes de implementación y de plan concreto aprobado por ticket.                 | Conservar el orden aprobado HAB-05 → HAB-03 → HAB-04 → HAB-06, revisando el cierre de cada corte. |
+| E2-BE-01, E2-BE-02, E2-BE-03, E2-BE-05, E2-BE-06, E2-BE-07 | Pendientes; existe spec backend aprobada, no implementación funcional E2 acreditada. | Cada corte requiere sus habilitantes, plan, tests y revisión.                                     |
+| E2-FE-01, E2-FE-02, E2-FE-03, E2-FE-04, E2-FE-05, E2-FE-06 | Pendientes; existe spec frontend aprobada.                                           | Las pruebas UI de HAB-01 no acreditan estos criterios E2.                                         |
+| E2-INT-01, E2-INT-03, E2-INT-04                            | Pendientes.                                                                          | Integración y evidencia por cortes, sin posponer las regresiones al final.                        |
+| E2-VIS-01, E2-VIS-02, E2-VIS-03                            | Pendientes de ejecución y de plan por ticket/vista.                                  | Respetar los cortes de la spec frontend aprobada y DESIGN.md.                                     |
 
-El siguiente paso es resolver los PA del primer corte y solicitar autorización
-para crear sus specs. La aprobación de esta organización no decide fechas
-futuras, reactivación, borrado de metas o actualización continua. No se ha hecho
-staging, commit ni push como parte de esta actualización.
+Total: **23 tickets: 1 cerrado, 1 implementado pendiente de cierre y 21 pendientes**.
+El siguiente habilitante es HAB-03. BE-01 y BE-02 dependen de HAB-03; el orden
+aprobado y los planes concretos siguen vigentes. Esta actualización no autoriza
+implementar, avanzar tickets, hacer staging, commit o push.
+
+## 14. Matriz de trazabilidad y verificación
+
+Fuentes canónicas: [PRD](../prd/savepoint.md), [épicas](epicas.md),
+[spec BE](../specs/E2-backend.md) y [spec FE](../specs/E2-frontend.md).
+BE/FE en la tabla remiten a esas specs; los IDs BE-AC/FE-AC son sus escenarios.
+En las columnas de tickets, HAB/BE/FE/INT/VIS abrevia el prefijo E2; una barra
+separa sufijos del mismo prefijo (BE-01/02 significa E2-BE-01 y E2-BE-02).
+Los métodos son **previstos** salvo la evidencia parcial E1 indicada; nombrar un
+test o disponer de un runner no significa haber ejecutado aceptación funcional E2.
+
+| Decisión  | Historia / épica                  | Criterio PRD | Tickets responsables                        | Spec / escenario                          | Método de verificación                                                                                                                                                                      | Evidencia actual                                                           |
+| --------- | --------------------------------- | ------------ | ------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| H1/H3     | HU01, HU07 / E1-02, E2-02         | AC01         | HAB-03/04, BE-01, FE-01, INT-04             | BE-AC01, FE-AC01; contrato de fecha civil | Unitarias de calendario y TZ, HTTP local de partidas y UI de formulario/historial/resumen; toda la duración queda en el día declarado.                                                      | Pendiente E2.                                                              |
+| H1        | HU01 / E2-02                      | AC02         | BE-01, FE-01, INT-04                        | BE-AC01, FE-AC01                          | Reloj de referencia controlado, límites inclusivos lunes/domingo y exclusión de 08/16; fijar hoy al 15/11 para incluir el domingo sin contradecir P02.                                      | Pendiente E2.                                                              |
+| H2/H3     | HU03, HU04 / E2-01/02             | AC03         | BE-03/05, FE-03/04, VIS-03, INT-04          | BE-AC02, FE-AC02                          | Unitarias y HTTP de cumplimiento; UI con 420 minutos/2 días, objetivo 300 minutos/3 días: 140 %, barra 100, no cumplida.                                                                    | Pendiente E2.                                                              |
+| H3/H4     | HU01, HU02 / E2-02/03             | AC04         | BE-01/02, FE-01/02, INT-04                  | BE/FE §9, verificación dirigida AC04      | Dos sesiones de 30/60 minutos del juego A y 15 del B en la misma fecha: A=90 minutos/1 día, B=15/1; rachas globales=1/1. Unitarias de ambas funciones, GET de progreso/rachas y UI con DTO. | Pendiente E2.                                                              |
+| H4        | HU02, HU07 / E2-03                | AC05         | BE-02, FE-02, INT-03/04                     | BE-AC03, FE-AC10                          | Reloj/TZ controlados para hoy/ayer y corte de día; UI con timers/foco/visibilidad y limpieza StrictMode según P06.                                                                          | Pendiente E2.                                                              |
+| H4/H6/H7  | HU07 / E2-02/03/04/06             | AC06         | BE-01/02, INT-01/04                         | BE-AC09, FE-AC08                          | Unitarias y HTTP local tras altas/bajas/retroactividad y borrado de juego; UI reconsulta; una partida restante conserva el día global.                                                      | Pendiente E2; CRUD/cascada E1 parciales en HAB-01.                         |
+| H5        | HU03, HU04, HU06 / E2-01/04       | AC07         | BE-03/05/07, FE-03/04/06, INT-04            | BE-AC05/06, FE-AC04; P04/P05              | Tablas de límites/tipos y ausencia de mutaciones; HTTP local, concurrencia con índice real y UI de validación/conservación de campos.                                                       | Pendiente E2.                                                              |
+| H5/H6     | HU03, HU04 / E2-01/02             | AC08         | BE-03/05, FE-03/04, INT-04                  | BE-AC05/07/11, FE-AC04                    | HTTP concurrente con índice creado y escrituras condicionales; una sola activa, actividad previa incluida, edición recalcula y carrera PUT/DELETE no reactiva.                              | Pendiente E2.                                                              |
+| H6/H8     | HU05 / E2-01                      | AC09         | BE-06, FE-05, INT-04                        | BE-AC07, FE-AC05                          | HTTP DELETE 204/repetición; UI de cancelar/confirmar, teclado/foco, reconsulta y error sin pérdida de actividad.                                                                            | Pendiente E2.                                                              |
+| H7        | HU06, HU07 / E2-04/06             | AC10         | BE-07, FE-06, INT-01/04                     | BE-AC08, FE-AC06/08                       | Unitarias y HTTP de máximo 80/30/70 e hito 75; borrar el 80 devuelve pendiente. UI reconsulta, IDs estables y logros E1 intactos.                                                           | Pendiente E2; máximo/resumen E1 parcial en HAB-01.                         |
+| H8        | HU01, HU02, HU05 / E2-02/03/05    | AC11         | BE-01/02/06, FE-01/02/05, INT-04            | BE-AC04, FE-AC03                          | Unitarias y HTTP con/sin meta y sin partidas; UI distingue ceros de null, conserva avance/rachas e invita a crear meta.                                                                     | Pendiente E2.                                                              |
+| H9/H4     | HU02, HU03, HU04 / E2-01/03/05    | AC12         | BE-02/03/05, FE-02/03/04, INT-04            | BE-AC06, FE-AC07                          | HTTP y UI de crear/editar/cambiar estado Completado/Abandonado; meta permanece y partidas cuentan en racha global.                                                                          | Pendiente E2.                                                              |
+| E1, H1–H9 | HU07, HV01–HV03 / E1-05, E2-05/06 | AC13         | HAB-01/03/04/05/06, INT-01/04, VIS-01/02/03 | Regresiones E1, BE §9, FE-AC08/11/12      | HTTP local de E1, UI de estados/recuperación; revisión manual por vista de móvil/escritorio, teclado, contraste, tamaño y movimiento reducido.                                              | Parcial E1 en HAB-01/HAB-05; integración funcional y visual E2 pendientes. |
+
+### Criterios de contrato y habilitantes complementarios
+
+| Criterio / fuente                                     | Ticket responsable                                            | Método previsto o evidencia existente                                                                                                                                                   |
+| ----------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BE-AC10 y contrato HTTP 400/404/409/413/500/requestId | BE-03 según C05/T3; regresión en cada corte afectado e INT-04 | HTTP local negativo: parser, tamaño, validación, duplicados y fallos controlados. T3 sigue pendiente; la caracterización 500 sin requestId no aprueba el contrato futuro.               |
+| BE-AC11                                               | BE-03/06 e INT-04                                             | Integración de carrera PUT/DELETE con escrituras condicionales; escenario también enlazado con AC08.                                                                                    |
+| FE-AC09                                               | FE-01/02, INT-03/04                                           | Promesas de GET controladas, cancelación/descarte por ID o día y respuestas fuera de orden; no mezclar juegos ni periodos.                                                              |
+| FE-AC12                                               | FE-03/04/05, INT-01/04                                        | Tests UI de carga parcial, 500/no JSON y guardado confirmado con lectura fallida: reintentar lectura sin duplicar mutación.                                                             |
+| B5 / DoD HAB-01                                       | HAB-01                                                        | Ejecutado y cerrado: runners aislados, regresión E1 y estados UI; [evidencia](../verificaciones/E2-HAB-01.md). No cubre por sí solo aceptación E2.                                      |
+| B3 / DoD HAB-05                                       | HAB-05                                                        | Ejecutado, cierre pendiente: resolver puro, ambos clientes con fetch simulado y rechazo previo a red; [evidencia](../verificaciones/E2-HAB-05.md). Sin certificar Render ni proxy real. |
+| B1/B2 / DoD HAB-03/04                                 | HAB-03/04                                                     | Previsto: validación/calendario/HTTP y formulario/representación con TZ diferentes, según AC01 y las specs.                                                                             |
+| B4 / DoD HAB-06                                       | HAB-06                                                        | Previsto: fallo de envío, datos/formulario conservados y corrección/reintento manual; la recuperación de biblioteca de HAB-01 no lo acredita.                                           |
+
+## 15. Precedencia SDD en Git
+
+| Entrega                                  | Hecho comprobado en Git                                                                                                              | Lectura de trazabilidad                                                                                                                                                      |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PRD, épicas y backlog                    | Incorporados en 873d26f.                                                                                                             | Documentación de producto previa a HAB-01 y HAB-05.                                                                                                                          |
+| Specs BE/FE y primera base de HAB-01     | Ambos documentos se incorporaron por primera vez en ca734b6, junto con código/configuración/tests de HAB-01; no estaban en su padre. | Excepción histórica: aprobación previa en conversación, pero no hubo un commit de specs anterior al código inicial de HAB-01. No se inventa precedencia ni se reescribe Git. |
+| Ampliaciones y cierre HAB-01             | b67caa4 y 25d1daf posteriores a ca734b6.                                                                                             | Specs ya versionadas; cierre explícito registrado en su evidencia.                                                                                                           |
+| HAB-05                                   | Código, pruebas y evidencia en 1e528cb, posterior a ca734b6 y 25d1daf.                                                               | Specs existentes anteriores al código; plan concreto aprobado en conversación. Cierre todavía pendiente.                                                                     |
+| Funcionalidad E2 y regularización actual | No se acredita implementación funcional E2 en los commits anteriores; esta regularización todavía no tiene commit.                   | Las correcciones documentales aprobadas se revisarán y versionarán, con autorización independiente, antes del siguiente código que las implemente.                           |
+
+La excepción de HAB-01 es documental y no revoca el cierre ya aprobado ni obliga
+a rehacer su implementación. Para los siguientes tickets se comprobará que la
+versión aplicable de la spec figure en un commit anterior al código, además de
+la aprobación explícita y del plan concreto. Esta regularización solo modifica
+los siete documentos autorizados, sin staging, commit ni push.

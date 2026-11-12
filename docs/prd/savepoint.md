@@ -2,9 +2,10 @@
 
 Fecha: 11 de noviembre de 2026.
 
-Estado: decisiones H1–H9 aprobadas; documento pendiente de revisión. Este PRD
-no autoriza implementar funcionalidades: cada ticket requiere una spec aprobada
-en `docs/specs/`. La spec del frontend sigue pendiente.
+Estado: **PRD y decisiones H1–H9 aprobados en conversación**. Las specs
+[backend](../specs/E2-backend.md) y [frontend](../specs/E2-frontend.md) también
+están aprobadas y versionadas. Cada ticket requiere además su plan aprobado;
+la aprobación documental no acredita implementación ni cierre.
 
 ## Fuentes y aprobación
 
@@ -15,6 +16,11 @@ en `docs/specs/`. La spec del frontend sigue pendiente.
   H4 y H8 y añadió H9. Después aprobó la redacción consolidada con «Aprobado».
   Esta aprobación incluye rachas globales, día local de inicio, indicadores sin
   meta, metas en juegos completados/abandonados e incrementos de un minuto.
+- Aprobación posterior de ambas specs: «Si esta bien los specs estan aprobados».
+  Las resoluciones PA02–PA07 quedan recogidas en los contratos aprobados; PA01
+  conserva únicamente el cotejo académico externo pendiente.
+- Estado de tickets, matriz criterio → verificación y precedencia en Git:
+  [backlog, secciones 13–15](../backlog/E2-metas-y-rachas.md#13-estado-actual-y-siguiente-paso).
 
 No se encontró una ficha de hechos independiente ni la lista académica original
 de ocho huecos. H1–H8 son los identificadores de trabajo discutidos y aprobados
@@ -130,8 +136,8 @@ No es necesario persistir una operación programada a medianoche: la spec deber�
 garantizar que el valor consultado corresponde al día local vigente.
 
 La pantalla debe presentar los indicadores actualizados tras registrar/eliminar
-partidas. La forma de refrescar una pantalla abierta al cambiar de día queda
-pendiente del contrato de interacción, sin añadir notificaciones.
+partidas. La actualización con pantalla abierta se rige por P06 de la spec
+frontend aprobada, sin añadir notificaciones; su ejecución corresponde a INT-03.
 
 ### Metas, hitos y estados de interfaz
 
@@ -145,8 +151,8 @@ En el detalle se conserva el resumen E1 y se añade progreso semanal. Las rachas
 se identifican como globales. Los estados sin datos deben distinguir ausencia
 de partidas de ausencia de meta. Formularios con validación comprensible,
 prevención de envíos duplicados y estados de carga/error/éxito según DESIGN.md.
-El comportamiento de reactivación e historial de metas inactivas no se presume
-aprobado: véanse los puntos abiertos.
+La resolución aprobada PA03 conserva metas inactivas sin reactivación ni una
+vista histórica; el contrato canónico se mantiene en la spec backend.
 
 ## Escenarios de aceptación para convertir en pruebas
 
@@ -167,7 +173,8 @@ aprobado: véanse los puntos abiertos.
 | AC13 | Los flujos de E1, su resumen vacío y su máximo avance siguen funcionando. La interfaz respeta DESIGN.md, teclado, móvil/escritorio y estados de datos.                                                         | E1, H1–H9 |
 
 Estos escenarios son especificación, no evidencia de ejecución. Las specs
-añadirán los casos negativos de contrato y los detalles de interacción pendientes.
+aprobadas añaden casos negativos de contrato y detalles de interacción; su
+verificación prevista y evidencia actual se distinguen en la matriz del backlog.
 
 ## Dependencias y tratamiento del diagnóstico
 
@@ -190,22 +197,24 @@ No se leerán/modificarán `.env` ni se ejecutarán pruebas que los carguen.
   de inicio que el sistema no captura.
 - La actividad se calcula sobre el conjunto actual de datos de la aplicación.
   No se atribuye a cuentas individuales inexistentes.
-- Los registros antiguos se usan con las fechas que contienen hasta acordar una
-  política de revisión; aprobar E2 no autoriza corregirlos automáticamente.
+- Los registros antiguos se interpretan según P07 de la spec backend aprobada,
+  sin inventar el inicio original ni autorizar una migración automática.
 - Las decisiones H1–H9 no garantizan conformidad con una ficha académica ausente.
 
-## Puntos abiertos antes de las specs afectadas
+## Estado consolidado de decisiones PA
 
-| ID   | Punto que requiere decisión o precisión                                                                                                                                                                   |
-| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PA01 | Contrastar con la ficha de hechos y los ocho huecos originales cuando se proporcionen; resolver cualquier discrepancia explícitamente.                                                                    |
-| PA02 | Fechas futuras: se propuso rechazarlas, pero no se incluyó en la última redacción consolidada H1–H9. Confirmar ese alcance y los límites de registro retroactivo antes del contrato de partidas.          |
-| PA03 | Metas inactivas: decidir si solo se permite crear otra o también reactivar; precisar qué se conserva del documento inactivo y su relación con borrar un videojuego. No añadir una vista histórica.        |
-| PA04 | Hitos: decidir si porcentaje debe ser entero, si se permiten objetivos/descripciones repetidos y el máximo de longitud de descripción.                                                                    |
-| PA05 | Fijar formato visible y precisión de redondeo de horas y porcentaje semanal; conservar dos decimales del resumen E1. Precisar la entrada de horas con granularidad de un minuto sin errores de precisión. |
-| PA06 | Definir actualización al cambiar de día/semana con pantalla abierta y representación accesible exacta de indicadores sin meta, en la spec del frontend.                                                   |
-| PA07 | Acordar tratamiento de datos antiguos con desfase sin inventar fechas originales; la migración no está autorizada.                                                                                        |
+| ID   | Estado                      | Resolución y fuente canónica                                                                                                                                        |
+| ---- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PA01 | Pendiente de cotejo externo | Falta la ficha original para contrastar H1–H8 con los ocho huecos académicos. No se inventa equivalencia; H9 sigue siendo una decisión adicional aprobada.          |
+| PA02 | Aprobado en las specs       | P02 backend: rechazo de fechas nuevas futuras respecto a Guayaquil, límites de retroactividad y exclusión temporal de registros futuros antiguos según el contrato. |
+| PA03 | Aprobado en las specs       | P03 backend: conservar inactivas, crear otra con nuevo ID, sin reactivación ni vista histórica; cascada del juego a sus metas sin prometer atomicidad general.      |
+| PA04 | Aprobado en las specs       | P04 backend: descripción recortada de 1–120 caracteres, porcentaje entero 1–100, duplicados permitidos e identidad por ID.                                          |
+| PA05 | Aprobado en las specs       | P05 backend/frontend: minutos enteros canónicos; entrada, límites y presentación precisados sin redondear decisiones de cumplimiento.                               |
+| PA06 | Aprobado en las specs       | P06 frontend: reconsulta al cambio de día de Guayaquil y retorno de foco/visibilidad, sin polling periódico ni notificaciones.                                      |
+| PA07 | Aprobado en las specs       | P07 backend: interpretar el día UTC ya guardado, sin reconstruir el inicio local original ni migrar datos; tratamiento controlado de datos no interpretables.       |
 
-Se mantienen abiertos de forma explícita; no impiden revisar este PRD, pero las
-specs afectadas deben resolverlos antes de aprobar su implementación. Los detalles
-de persistencia, rutas nuevas y transacciones pertenecen a esas specs.
+Las resoluciones completas permanecen en la sección 2 de las specs
+[backend](../specs/E2-backend.md) y [frontend](../specs/E2-frontend.md); esta tabla
+actualiza su estado sin sustituir contratos ni solicitar de nuevo su aprobación.
+PA01 limita la certificación académica, no bloquea automáticamente todos los
+tickets técnicos. Las dependencias y la preparación de cada ticket siguen siendo exigibles.

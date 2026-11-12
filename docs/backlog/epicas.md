@@ -2,9 +2,10 @@
 
 Fecha: 11 de noviembre de 2026.
 
-Estado: planificación para revisión. H1–H9 aprobados en conversación; ningún
-ticket de implementación se considera aprobado, iniciado ni terminado por crear
-este backlog. No se ha realizado commit de estos documentos.
+Estado: **PRD, épicas y backlog aprobados en conversación** y versionados en
+873d26f. Ambas specs están aprobadas. HAB-01 está cerrado; HAB-05 está implementado
+y verificado, pendiente de autorización de cierre. Los demás tickets no se
+consideran ejecutados por tener planificación; requieren su plan aprobado.
 
 Fuentes: [PRD](../prd/savepoint.md), [diagnóstico](../diagnostico.md) y
 [DESIGN.md](../../DESIGN.md). Los identificadores H, AC y PA corresponden al PRD.
@@ -16,10 +17,14 @@ registro e historiales de partidas, eliminación con confirmación/cascada y
 resumen acumulado. Este resumen conserva cantidad, horas a dos decimales,
 última fecha, máximo avance y valores vacíos; no se sustituye por E2.
 
-**Estado:** funcionalidad existente inspeccionada, con defectos documentados;
-no se certifica como libre de errores ni cubierta por tests del producto.
+**Estado:** E1 tiene regresiones automatizadas parciales acreditadas en
+[HAB-01](../verificaciones/E2-HAB-01.md) y [HAB-05](../verificaciones/E2-HAB-05.md).
+Persisten los defectos y límites documentados; esto no certifica todo E1.
 
-Los siguientes trabajos son habilitantes para E2 y no nuevas funcionalidades de E1:
+Los siguientes trabajos son habilitantes para E2 y no nuevas funcionalidades de E1.
+Las dependencias PA remiten al [estado consolidado del PRD](../prd/savepoint.md#estado-consolidado-de-decisiones-pa):
+PA02–PA07 están resueltos en las specs aprobadas; PA01 conserva el cotejo externo.
+La matriz detallada y los estados por ticket están en el [backlog](E2-metas-y-rachas.md#13-estado-actual-y-siguiente-paso).
 
 | ID    | Trabajo previsto                                                                               | Aceptación prevista                                                                                                              | Dependencias                                                                                   |
 | ----- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -56,12 +61,13 @@ cuentas, edición de partidas y rediseño completo de E1 sin spec separada.
 
 ### Secuencia propuesta
 
-1. Revisar PRD/backlog y cerrar puntos abiertos de los tickets próximos.
-2. Preparar y aprobar specs de habilitantes E1; incorporar pruebas antes de
-   implementar los flujos afectados.
-3. Aprobar specs de contratos y cálculos E2. Las rachas globales pueden avanzar
-   sin depender de metas una vez resuelto el contrato de fechas.
-4. Aprobar la spec del frontend antes de aplicar cualquier cambio visual.
+1. Conservar las decisiones aprobadas y consultar el estado de cada dependencia.
+2. Completar los habilitantes del flujo con su plan aprobado y pruebas primero;
+   usar las specs existentes, sin repetir sus aprobaciones.
+3. Implementar contratos y cálculos E2 por cortes bajo plan aprobado. Las rachas
+   globales pueden avanzar sin metas una vez resuelto el contrato de fechas.
+4. Aplicar cambios visuales solo en los cortes de la spec frontend aprobada y
+   con un plan por ticket/vista, sin ampliar el alcance.
 5. Completar integración, ejecutar aceptación y presentar evidencia para revisión.
 
 No se asignan responsables, fechas de entrega ni estimaciones inventadas.
@@ -107,5 +113,7 @@ criterio, revisar regresiones E1 y, cuando aplique, verificar DESIGN.md en móvi
 escritorio, teclado y estados de carga/error/vacío/éxito. Registrar comandos,
 resultados y limitaciones. Ningún ticket se cierra solo con tests del harness.
 
-Esta fase entrega únicamente documentos para revisión. No implementa tickets,
-no cambia frontend/backend ni permite commit o push automático.
+La regularización SDD actualiza únicamente documentación. No implementa tickets,
+no cambia frontend/backend ni permite staging, commit o push automático.
+La precedencia documental en Git y la excepción histórica de HAB-01 se registran
+en el [backlog](E2-metas-y-rachas.md#15-precedencia-sdd-en-git).

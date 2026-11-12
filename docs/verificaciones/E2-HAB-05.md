@@ -3,7 +3,9 @@
 Fecha: 11 de noviembre de 2026, America/Guayaquil.
 
 Estado: implementado y verificado, pendiente de revisión y autorización de
-cierre del usuario. No se realizó staging, commit ni push.
+cierre del usuario. Implementación incorporada en **1e528cb**, por invocación
+manual de la skill commit. El commit no constituye aprobación de cierre.
+La regularización documental posterior no realizó staging, commit ni push.
 
 ## Alcance aprobado y trazabilidad
 
@@ -154,13 +156,31 @@ T2 no se considera resuelta: request y la representación de errores siguen
 separados. T3 permanece pendiente (JSON malformado 500 sin requestId). No se
 resolvieron B1/B2/B4 ni se avanzó a HAB-03/04/06 o funcionalidades E2.
 
-## Archivos del ticket
+## Archivos de implementación del ticket (1e528cb)
 
 - Nuevos: frontend/src/api/baseUrl.ts, frontend/src/api/baseUrl.test.ts y este documento.
 - Modificados: frontend/src/api/videojuegosApi.ts, frontend/src/api/partidasApi.ts,
   frontend/tests/api.test.ts y README.md.
 - Sin cambios en backend, componentes, estilos, dependencias, specs o backlog.
 
-Mensaje de commit sugerido, sin ejecutarlo:
+Commit de implementación ejecutado por autorización independiente del usuario:
 
-`fix: alinear base API y prefijo en E2-HAB-05`
+`1e528cb fix: alinear base API y prefijo en E2-HAB-05`
+
+## Regularización de trazabilidad SDD
+
+El usuario aprobó el plan documental mediante «Plan aprobado». Se actualiza la
+referencia al commit, sin alterar resultados ni autorizar cierre. Las specs
+estaban versionadas en ca734b6 y actualizadas en 25d1daf, ambos anteriores al
+código HAB-05 de 1e528cb. El alcance concreto fue aprobado antes de implementarlo.
+
+La tabla de archivos de la spec frontend asigna ahora la creación inicial de
+metasApi.ts únicamente a FE-01. HAB-05 conserva la resolución de base y sus dos
+clientes E1, según el plan aprobado; no se considera faltante una funcionalidad
+que no pertenecía a ese corte.
+
+Estado, dependencias y métodos de verificación se consultan en el
+[backlog](../backlog/E2-metas-y-rachas.md#13-estado-actual-y-siguiente-paso).
+La matriz diferencia aceptación funcional E2 prevista de las regresiones E1 ya
+ejecutadas. No se volvieron a ejecutar tests del producto para este ajuste documental;
+T2/T3 y las limitaciones de despliegue/producción descritas siguen vigentes.

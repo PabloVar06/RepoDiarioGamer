@@ -42,10 +42,14 @@ a aprobación pendiente describen la redacción inicial, no el estado actual de 
 | F-C07 | Los headers de PRD/épicas conservan pendiente/para revisión aunque su aprobación está registrada en conversación/backlog.      | Usar H1–H9 aprobados y mantener estas specs como borradores. No cambiar fuentes ajenas a esta tarea.                                                           |
 | F-C08 | VIS-01 cambia tokens/Tailwind compartidos y puede alterar E1 aunque no se editen componentes, mientras VIS-02 sigue reservado. | Aprobar ese efecto global en P-VIS o limitar temporalmente tokens nuevos a vistas E2. No afirmar aislamiento visual por no tocar App.tsx.                      |
 
-### Propuestas pendientes comunes y de interfaz
+### Resoluciones aprobadas comunes y de interfaz
 
-- **P02/P03/P04/P07:** adoptar solo si se aprueban las resoluciones de PA02,
-  PA03, PA04 y PA07 descritas en backend. No inventar validaciones diferentes en UI.
+Las condiciones pendientes del análisis F-C01–F-C08 describen el antecedente
+anterior a la aprobación. El estado consolidado vigente está en el
+[PRD](../prd/savepoint.md#estado-consolidado-de-decisiones-pa).
+
+- **P02/P03/P04/P07:** aplicar las resoluciones aprobadas de PA02, PA03, PA04 y
+  PA07 descritas en backend. No inventar validaciones diferentes en UI.
 - **P05 / PA05:** objetivo mediante dos controles etiquetados Horas y Minutos,
   ambos enteros; horas 0–100, minutos 0–59 y total de 1–6000 minutos. A 100 horas
   solo se permite minuto 0. Días enteros 1–7. Mostrar objetivo como horas/minutos,
@@ -54,22 +58,22 @@ a aprobación pendiente describen la redacción inicial, no el estado actual de 
   Si el redondeo llevara un valor menor de 100 a “100 %”, mostrar “<100 %” y no
   marcar cumplido: prevalece la comparación precisa de backend. Valores que
   exceden 100 conservan su condición de exceso aunque el formato deba mostrar
-  “>100 %” para un exceso menor que la precisión visible. Esta precisión es propuesta.
+  “>100 %” para un exceso menor que la precisión visible. Esta precisión forma parte de la spec aprobada.
 - **P06 / PA06:** usar `fechaLocalActual` y zona del backend como referencia.
   Mientras la vista está visible, programar una única próxima reconsulta en el
   siguiente cambio de día de Guayaquil; reprogramar tras responder. Al recuperar
   foco/visibilidad, reconsultar para cubrir suspensión de pestaña. No hacer polling
   periódico. Un temporizador puede retrasarse por el navegador: actualizar al
   recuperar ejecución y no prometer cambio de DOM exacto con la pestaña suspendida.
-- **P-VIS:** proponer que la renovación E1 de VIS-02 incluya navegación/layout,
+- **P-VIS:** la renovación E1 descrita para VIS-02 incluye navegación/layout,
   biblioteca, formularios de videojuegos/partidas e historial, con cambios solo
   de tokens, jerarquía, espaciado, controles y estados. No cambiar rutas, modelo
   de logros, búsqueda concurrente ni campos de negocio. El detalle E1/E2 queda
-  en VIS-03. P-VIS requiere confirmación explícita del alcance reservado.
+  en VIS-03. La ejecución de este alcance requiere su plan aprobado por ticket/vista.
 
-No basta aprobar el nombre de una spec si se mantienen pendientes decisiones
-que cambien sus contratos. La aprobación debe indicar las propuestas aceptadas
-y cualquier parte reservada. PA01 sigue pendiente de la ficha externa ausente.
+La aprobación de la spec no permite ampliar estas resoluciones ni ejecutar otros
+tickets sin su plan aprobado. PA01 sigue pendiente de la ficha externa ausente;
+las resoluciones anteriores no se reabren por esta regularización documental.
 
 ## 3. Reglas DEBE / NO DEBE
 
@@ -245,7 +249,7 @@ tokens es implementación visual y NO se realiza al redactar esta spec.
 | ID      | DADO / CUANDO / ENTONCES                                                                                                                                                      | Verificación futura                                                               |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | FE-AC01 | DADO un día de inicio elegido en Ecuador, CUANDO envío y veo historial/resumen, ENTONCES conserva el día sin campo de hora ni conversión de instante.                         | AC01/AC02; prueba de formulario y representación con distintos TZ.                |
-| FE-AC02 | DADO 420 minutos/2 días y meta 5 horas/3 días, CUANDO carga el detalle, ENTONCES texto 140 %, barra 100 y meta no cumplida.                                                   | AC03/AC04; contraste entre texto, aria y estado conjunto.                         |
+| FE-AC02 | DADO 420 minutos/2 días y meta 5 horas/3 días, CUANDO carga el detalle, ENTONCES texto 140 %, barra 100 y meta no cumplida.                                                   | AC03; contraste entre texto, aria y estado conjunto.                              |
 | FE-AC03 | DADO juego sin meta, CUANDO consulto, ENTONCES horas/días, avance y rachas globales permanecen visibles, con invitación a crear y sin falso 0 % de cumplimiento.              | AC11, incluidos ceros reales y error distinto de vacío.                           |
 | FE-AC04 | DADO meta válida o inválida, CUANDO guardo dos veces rápidamente o el servidor rechaza, ENTONCES hay un solo envío pendiente y los valores siguen disponibles al fallar.      | AC07/AC08; 400, 409 y fallo de red.                                               |
 | FE-AC05 | DADO una meta activa, CUANDO cancelo o confirmo desactivación, ENTONCES cancelar no envía DELETE; confirmar envía una vez, respeta 204 y reconsulta sin borrar actividad.     | AC09; teclado/foco y fallo de consulta posterior sin repetir DELETE.              |
@@ -256,6 +260,16 @@ tokens es implementación visual y NO se realiza al redactar esta spec.
 | FE-AC10 | DADO final de día/semana o pestaña suspendida, CUANDO se ejecuta la política P06 aprobada, ENTONCES reconsulta y muestra racha/semana vigentes sin polling continuo.          | AC05 y PA06; timers/listeners limpios bajo StrictMode.                            |
 | FE-AC11 | DADO vistas incluidas en el corte visual aprobado, CUANDO uso móvil, escritorio, teclado o movimiento reducido, ENTONCES cumple DESIGN.md sin cambiar funciones de E1.        | AC13 visual; evidencia por vista, contraste, foco, estados y tamaño de controles. |
 | FE-AC12 | DADO carga parcial o guardado confirmado con GET fallido, CUANDO se informa, ENTONCES no desaparecen E1/formularios ni se duplica la escritura; se ofrece reintentar lectura. | Tests de estados independientes y respuesta 500/no JSON.                          |
+
+### Verificación dirigida de AC04
+
+Con el fixture de AC04 definido en la sección 9 de la spec backend, una prueba de
+interfaz con DTO simulados comprueba en el juego A 1,5 horas y 1 día semanal,
+y racha actual/mejor globales de 1. Las dos partidas del mismo juego no producen
+2 días ni la del otro juego aumenta la racha a 3. No se recalcula la regla en React.
+
+Responsables: E2-FE-01, E2-FE-02 y consolidación E2-INT-04. Es verificación prevista,
+no evidencia ejecutada. FE-AC02 conserva exclusivamente la vinculación con AC03.
 
 Runner de HAB-01 disponible: Vitest 3.2.6, React Testing Library/user-event y
 jsdom, como dependencias de desarrollo fijadas en package.json/lockfile y
@@ -274,15 +288,15 @@ es complementario. Configuración y resultados de HAB-01 constan en
 
 ## 10. Tabla ticket → archivos previstos
 
-N = nuevo y M = modificación respecto al plan original. HAB-01 ya dispone de
-infraestructura y evidencia; las demás filas conservan su planificación aprobada.
+N = nuevo y M = modificación respecto al plan original. HAB-01 está cerrado y
+HAB-05 implementado, pendiente de cierre; las demás filas conservan su planificación aprobada.
 Rutas repetidas indican trabajo incremental.
 
 | Ticket                      | Archivos previstos                                                                                                                                                                                                                                                               | Alcance / evidencia                                                                                                                           |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | E2-HAB-01 (parte FE)        | M `frontend/package.json`, lockfile; N `frontend/vitest.config.ts`, `tests/setup.ts`, `tests/base.test.tsx`                                                                                                                                                                      | Runner aislado sin carga de `.env`; no configuración de pruebas escondida en build.                                                           |
 | E2-HAB-04                   | M `frontend/src/App.tsx`; N `src/utils/fechas.ts`, `src/utils/fechas.test.ts`, `tests/partidas-fecha.test.tsx`                                                                                                                                                                   | Campo fecha y formato civil en E1; no extraer todas las pantallas.                                                                            |
-| E2-HAB-05                   | N `frontend/src/api/baseUrl.ts`, `src/api/baseUrl.test.ts`; M `src/api/videojuegosApi.ts`, `src/api/partidasApi.ts`; N `src/api/metasApi.ts`                                                                                                                                     | Base con `/api` y fallback de desarrollo propuesto; solo resolver BASE común, no refactor total T2. Documentar contrato en README si procede. |
+| E2-HAB-05                   | N `frontend/src/api/baseUrl.ts`, `src/api/baseUrl.test.ts`; M `src/api/videojuegosApi.ts`, `src/api/partidasApi.ts`                                                                                                                                                              | Base con `/api` y fallback de desarrollo implementados en 1e528cb; cierre pendiente. Solo BASE común, sin refactor total T2; README alineado. |
 | E2-HAB-06                   | M `frontend/src/App.tsx`; N `frontend/tests/partida-error.test.tsx`                                                                                                                                                                                                              | Error de envío no desmonta formulario E1 ni borra valores.                                                                                    |
 | E2-FE-01                    | N `frontend/src/api/metasApi.ts`, `src/api/metasApi.test.ts`, `src/pages/DetalleVideojuego.tsx`, `src/hooks/useProgresoVideojuego.ts`, `src/components/ProgresoSemanal.tsx`, `src/components/EstadoCargaError.tsx`; M `src/tipos.ts`, `src/App.tsx`; N `tests/progreso.test.tsx` | DTO/metasApi inicial, carga parcial y actividad sin meta; extracción acotada de Detalle.                                                      |
 | E2-FE-02                    | N `frontend/src/components/RachasGlobales.tsx`, `tests/rachas.test.tsx`; M `src/api/metasApi.ts`, `src/hooks/useProgresoVideojuego.ts`, `src/pages/DetalleVideojuego.tsx`, `src/tipos.ts`                                                                                        | Rachas globales, ceros y ausencia de meta.                                                                                                    |
@@ -291,7 +305,7 @@ Rutas repetidas indican trabajo incremental.
 | E2-FE-05                    | N `frontend/src/components/ConfirmarDesactivacion.tsx`, `tests/meta-desactivar.test.tsx`; M `src/pages/DetalleVideojuego.tsx`, `src/api/metasApi.ts`                                                                                                                             | Confirmación accesible, DELETE/204 y reconsulta.                                                                                              |
 | E2-FE-06                    | N `frontend/src/components/HitosEditor.tsx`, `src/components/HitosLista.tsx`, `tests/hitos.test.tsx`; M `src/components/MetaForm.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/tipos.ts`                                                                                         | Hasta 5 hitos, IDs estables y estados calculados.                                                                                             |
 | E2-INT-01 (parte FE)        | M `frontend/src/App.tsx`, `src/pages/DetalleVideojuego.tsx`, `src/hooks/useProgresoVideojuego.ts`; N `tests/reconsulta.test.tsx`                                                                                                                                                 | Registro/eliminación y navegación E1; refrescar cada indicador desde su entrega.                                                              |
-| E2-INT-03 (parte FE)        | M `frontend/src/hooks/useProgresoVideojuego.ts`; N `tests/cambio-periodo.test.tsx`                                                                                                                                                                                               | P06 si se aprueba; no introducir cron ni polling.                                                                                             |
+| E2-INT-03 (parte FE)        | M `frontend/src/hooks/useProgresoVideojuego.ts`; N `tests/cambio-periodo.test.tsx`                                                                                                                                                                                               | P06 aprobado; no introducir cron ni polling.                                                                                                  |
 | E2-VIS-01                   | M `frontend/src/index.css`, `frontend/tailwind.config.cjs`; M `frontend/index.html` solo si se aprueba un recurso/licencia de fuente; N `tests/tokens.test.ts`                                                                                                                   | Tokens y tipografía; el test de tokens no sustituye evidencia de contraste real.                                                              |
 | E2-VIS-02                   | M `frontend/src/App.tsx`, `src/index.css` y componentes E1 si el corte aprobado los requiere                                                                                                                                                                                     | Exclusivamente P-VIS aprobado: no reorganización general ni resolución incidental D1/D2.                                                      |
 | E2-VIS-03                   | M `frontend/src/pages/DetalleVideojuego.tsx`, `src/components/ProgresoSemanal.tsx`, `RachasGlobales.tsx`, `MetaForm.tsx`, `HitosEditor.tsx`, `HitosLista.tsx`, `ConfirmarDesactivacion.tsx`                                                                                      | Adopción visual E2 conservando comportamiento funcional.                                                                                      |
@@ -299,6 +313,13 @@ Rutas repetidas indican trabajo incremental.
 
 Las tablas backend/frontend cubren conjuntamente los 23 IDs vigentes; los IDs
 agrupados del borrador de 34 no se reintroducen como tickets nuevos.
+La resolución de BASE descrita en la sección 4 está implementada y verificada en
+HAB-05 (1e528cb), pendiente de cierre; la validación se realiza al solicitar datos,
+según el plan aprobado y su evidencia. Esta nota de estado no cambia el contrato.
+La creación inicial de metasApi.ts corresponde a FE-01, no a HAB-05. Los métodos
+se incorporan progresivamente en los cortes FE posteriores, reutilizando baseUrl.ts.
+El [backlog](../backlog/E2-metas-y-rachas.md#14-matriz-de-trazabilidad-y-verificación)
+relaciona decisiones, historias, AC, tickets y método de verificación.
 
 ## 11. Restricciones y aprobación
 
@@ -317,5 +338,6 @@ aprobados». Los cambios posteriores de contratos o decisiones requieren nueva
 aprobación y el plan de cada ticket delimita la implementación autorizada.
 
 **Evidencia actual:** runners y pruebas básicas de E1 documentados en
-[E2-HAB-01](../verificaciones/E2-HAB-01.md). Esto no acredita implementación de
+[E2-HAB-01](../verificaciones/E2-HAB-01.md) y resolución de base API verificada en
+[E2-HAB-05](../verificaciones/E2-HAB-05.md), pendiente de cierre. Esto no acredita
 componentes E2 ni adopción visual de Nebula Arcade, que corresponden a otros tickets.
