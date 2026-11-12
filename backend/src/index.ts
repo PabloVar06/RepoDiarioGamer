@@ -1,9 +1,11 @@
 import { conectarDB } from "./conexionDB";
 import { crearApp } from "./app";
 import { env } from "./config/env";
+import { inicializarMetas } from "./services/metas.service";
 
 async function main(): Promise<void> {
   await conectarDB();
+  await inicializarMetas();
 
   const app = crearApp({ frontendUrl: env.frontendUrl });
 
