@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "test": "node --require ./tests/setup.cjs --import tsx --test tests/*.test.ts",
     "test:unit": "npm test",
+    "test:integration": "node --require ./tests/integration/preload.cjs --import tsx --test --test-concurrency=1 tests/integration/*.test.ts",
     "typecheck": "tsc --noEmit && tsc --project tsconfig.test.json"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/node": "^20.11.0",
+    "mongodb-memory-server-core": "10.2.3",
     "tsx": "^4.7.0",
     "typescript": "^5.4.0"
   }
