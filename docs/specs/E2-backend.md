@@ -118,9 +118,10 @@ desactivada. No se introduce un sistema general de versionado u optimistic locki
 
 ## 5. Contratos HTTP aprobados
 
-Estado comprobado al 12 de noviembre de 2026: las rutas de metas y progreso
-de esta tabla están implementadas; GET `/api/rachas` sigue pendiente. Esta tabla
-conserva los contratos aprobados y no acredita por sí sola el cierre de tickets.
+Estado actualizado en el bloque de cierre del 12 de noviembre de 2026:
+todas las rutas de esta tabla, incluida GET `/api/rachas`, están implementadas
+y verificadas. Los contratos no cambian; la evidencia de DoD y cierre se recoge
+en [E2-cierre-tickets](../verificaciones/E2-cierre-tickets.md).
 
 | Método y ruta                       | Entrada             | Éxito                                                                                                |
 | ----------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -174,8 +175,8 @@ cambio de día, la UI DEBE detectar las fechas distintas y reconsultar el conjun
 ## 6. Funciones puras e interfaces internas
 
 Los nombres siguientes describen las interfaces aprobadas. Las funciones de
-fecha, actividad, cumplimiento e hitos tienen implementación y pruebas;
-`calcularRachasGlobales` sigue pendiente. Las funciones puras reciben valores
+fecha, actividad, cumplimiento, hitos y `calcularRachasGlobales` tienen
+implementación y pruebas, incluidas sus regresiones del bloque de cierre. Las funciones puras reciben valores
 simples y no dependen de Mongoose, Express, React,
 variables de entorno ni del reloj global. NO mutan sus entradas.
 
@@ -294,16 +295,17 @@ y las pruebas sin emitir archivos; es complementario a los tests funcionales.
 
 N = nuevo, M = modificar, respecto al plan original. Las filas conservan el mapa
 de archivos aprobado; no constituyen un inventario de archivos ya creados.
-HAB-01 está cerrado. BE-01/03/05/06/07 tienen funcionalidad backend verificada,
-con cierre pendiente. HAB-03 y BE-02 siguen pendientes; disponer de helpers de
-fecha no acredita la escritura civil de HAB-03. La
+HAB-01 y HAB-03 ya tenían cierre explícito. BE-01/02/03/05/06/07 están
+implementados y verificados, junto con la escritura civil de HAB-03. Su cierre
+se consolida bajo el plan aprobado en E2-cierre-tickets.md; el mapa siguiente
+no cambia los archivos ni el alcance aprobados. La
 [revisión de implementación](../verificaciones/E2-estado-implementacion.md)
 enlaza archivos y tests reales, incluidos los nombres que difieren del plan.
 
 | Ticket                 | Archivos previstos                                                                                                                                                                                                                                                                                                                                                                    | Alcance / evidencia                                                                         |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | E2-HAB-01 (parte BE)   | M `backend/package.json`, lockfile, `src/app.ts`, `src/index.ts`; N `backend/tests/setup.cjs`, `tests/app.test.ts`                                                                                                                                                                                                                                                                    | Runner, app inyectable y datos aislados; mantener `config/env.ts` fuera del grafo de tests. |
-| E2-HAB-03              | M `backend/src/modelos/Partida.model.ts`, `src/services/partidas.service.ts`; N `src/services/fechas.ts`, `tests/fechas.test.ts`                                                                                                                                                                                                                                                      | B1 y P02/P07 aprobados; implementación pendiente.                                           |
+| E2-HAB-03              | M `backend/src/modelos/Partida.model.ts`, `src/services/partidas.service.ts`; N `src/services/fechas.ts`, `tests/fechas.test.ts`                                                                                                                                                                                                                                                      | B1 y P02/P07 implementados/verificados en 59bfc98; sin migración.                           |
 | E2-BE-01               | N `backend/src/services/progreso.calculos.ts`, `src/services/progreso.service.ts`, `src/controllers/progreso.controller.ts`, `tests/progreso.test.ts`; M `src/routes/videojuegos.routes.ts`                                                                                                                                                                                           | Actividad semanal sin meta.                                                                 |
 | E2-BE-02               | N `backend/src/services/rachas.calculos.ts`, `src/services/rachas.service.ts`, `src/controllers/rachas.controller.ts`, `src/routes/rachas.routes.ts`, `tests/rachas.test.ts`; M `src/app.ts`                                                                                                                                                                                          | Consulta global con reloj explícito.                                                        |
 | E2-BE-03               | N `backend/src/modelos/Meta.model.ts`, `src/routes/metas.routes.ts`, `src/controllers/metas.controller.ts`, `src/services/metas.service.ts`, `tests/metas.test.ts`, `tests/metas.concurrente.test.ts`; M `src/app.ts`, `src/index.ts`, `src/routes/videojuegos.routes.ts`, `src/services/progreso.service.ts`, `src/services/progreso.calculos.ts`, `src/middlewares/errorHandler.ts` | CRUD inicial, índice y 409; inicialización del índice antes de escrituras.                  |
@@ -315,22 +317,20 @@ enlaza archivos y tests reales, incluidos los nombres que difieren del plan.
 | E2-INT-04 (parte BE)   | N/M `backend/tests/*.test.ts` vinculados arriba                                                                                                                                                                                                                                                                                                                                       | Matriz AC01–AC13 por bloques y regresiones del producto.                                    |
 
 El tratamiento acotado de C05/T3 exigido por BE-AC10 corresponde al plan de
-E2-BE-03: parser, clasificación HTTP y requestId según la sección 8. HAB-01 solo
-adelantó el aislamiento imprescindible de T5; su cierre no acredita corregir T3.
-El cambio de errores deberá explicitarse y probarse al abordar BE-03, sin resolver
-incidentalmente el resto de T1–T5/D1–D3.
+E2-BE-03 y fue autorizado como dependencia de FE-03. Está implementado en
+dab0637: requestId/logger antes del parser, JSON roto/escalar 400 y exceso 413,
+sin escrituras. HAB-01 solo adelantó el aislamiento imprescindible de T5;
+sus caracterizaciones antiguas de T3 son evidencia histórica, sustituidas después
+por tests de aceptación, sin reescribir ese historial.
 
-Estado de HAB-01: por instrucción posterior explícita del usuario, T3 se mantiene
-pendiente. La integración caracteriza el JSON malformado como 500 sin requestId,
-sin corregirlo ni dar por cumplido el contrato futuro de errores E2.
-
-Evidencia posterior de implementación: [modelo Meta](../verificaciones/E2-BE-03-modelo.md),
-[CRUD Meta](../verificaciones/E2-BE-03-crud.md) y
-[progreso semanal](../verificaciones/E2-BE-01-progreso.md). Son registros de
-cortes sucesivos: las carencias de cálculo descritas en la evidencia inicial del
-CRUD se cubren parcialmente en la posterior de progreso. Persisten T3, HAB-03,
-rachas e integración/cascada de metas según el backlog. No se cierran tickets
-por esta actualización documental ni se modifican los criterios de la spec.
+Evidencia de los cortes: [modelo Meta](../verificaciones/E2-BE-03-modelo.md),
+[CRUD](../verificaciones/E2-BE-03-crud.md),
+[progreso semanal](../verificaciones/E2-BE-01-progreso.md),
+[rachas](../verificaciones/E2-BE-02-rachas.md),
+[parser/cascada](../verificaciones/E2-dependencias-FE-03.md) y
+[cierre conjunto](../verificaciones/E2-cierre-tickets.md). Las carencias descritas
+en cada corte inicial no se trasladan como pendientes actuales cuando existe
+verificación posterior. T1/T2/T4/resto T5 y D1–D3 conservan sus límites.
 
 ## 11. Restricciones y aprobación
 
@@ -347,6 +347,7 @@ por esta actualización documental ni se modifican los criterios de la spec.
 aprobados». Si se cambia una resolución, actualizar los dos contratos afectados
 y solicitar aprobación antes de programar.
 
-**Evidencia actual:** infraestructura y regresiones E1 verificadas en
-[E2-HAB-01](../verificaciones/E2-HAB-01.md). Los criterios funcionales de E2
-anteriores siguen vinculados a sus tickets y no se consideran ejecutados por HAB-01.
+**Evidencia actual:** infraestructura E1 en [HAB-01](../verificaciones/E2-HAB-01.md);
+criterios funcionales E2 y cierre en [auditoría](../AUDITORIA.md) y
+[E2-cierre-tickets](../verificaciones/E2-cierre-tickets.md), con MongoDB temporal.
+Se actualizan solo notas de estado, sin alterar reglas, criterios o decisiones.

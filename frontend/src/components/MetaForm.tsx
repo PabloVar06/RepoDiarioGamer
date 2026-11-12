@@ -1,10 +1,21 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { ErrorApi } from "../api/metasApi";
-import type { CrearMeta, MetaDTO, ProgresoJuegoDTO } from "../tipos";
+import type {
+  CrearMeta,
+  EditarMeta,
+  MetaDTO,
+  ProgresoJuegoDTO,
+} from "../tipos";
+import {
+  HitosEditor,
+  validarHitosFormulario,
+  type HitoFormulario,
+} from "./HitosEditor";
 
 type Campo = "horas" | "minutos" | "dias";
 type Situacion = "editar" | "enviando" | "revisar" | "confirmada" | "existente";
-type Errores = Partial<Record<Campo, string>>;
+type Errores = Record<string, string>;
+type DatosFormulario = Omit<CrearMeta, "hitos"> & Pick<EditarMeta, "hitos">;
 const control =
   "mt-2 min-h-11 w-full rounded-pill border bg-fondo px-4 py-2 text-cuerpo text-texto disabled:opacity-70";
 const secundaria =
@@ -15,17 +26,36 @@ export function MetaForm({
   guardar,
   consultar,
   onCancelar,
+  metaInicial,
 }: {
   videojuegoId: string;
-  guardar: (datos: CrearMeta) => Promise<MetaDTO>;
+  guardar: (datos: DatosFormulario) => Promise<MetaDTO>;
   consultar: () => Promise<ProgresoJuegoDTO | null>;
   onCancelar: () => void;
+  metaInicial?: MetaDTO;
 }) {
   const prefijo = useId();
-  const [horas, setHoras] = useState("");
-  const [minutos, setMinutos] = useState("0");
-  const [dias, setDias] = useState("");
+  const editando = !!metaInicial;
+  const [horas, setHoras] = useState(
+    metaInicial ? String(Math.floor(metaInicial.minutosObjetivo / 60)) : "",
+  );
+  const [minutos, setMinutos] = useState(
+    metaInicial ? String(metaInicial.minutosObjetivo % 60) : "0",
+  );
+  const [dias, setDias] = useState(
+    metaInicial ? String(metaInicial.diasPorSemana) : "",
+  );
   const [errores, setErrores] = useState<Errores>({});
+  const [hitos, setHitos] = useState<HitoFormulario[]>(
+    () =>
+      metaInicial?.hitos.map((h) => ({
+        clave: h._id,
+        _id: h._id,
+        descripcion: h.descripcion,
+        porcentaje: String(h.porcentajeObjetivo),
+      })) ?? [],
+  );
+  const [hitosModificados, setHitosModificados] = useState(false);
   const [situacion, setSituacion] = useState<Situacion>("editar");
   const [consultando, setConsultando] = useState(false);
   const [mensaje, setMensaje] = useState("");
@@ -48,8 +78,23 @@ export function MetaForm({
         setEsError(!datos);
         setMensaje(
           datos
-            ? "Meta creada. Progreso actualizado."
-            : "La meta se creó, pero no pudimos actualizar el progreso. Reintenta solo la consulta.",
+            ? editando
+              ? "Meta actualizada. Progreso actualizado."
+              : "Meta creada. Progreso actualizado."
+            : editando
+              ? "Los cambios se guardaron, pero no pudimos actualizar el progreso. Reintenta solo la consulta."
+              : "La meta se creó, pero no pudimos actualizar el progreso. Reintenta solo la consulta.",
+        );
+      } else if (editando) {
+        const vigente = datos?.meta?._id === metaInicial._id;
+        setSituacion(vigente ? "editar" : datos ? "existente" : "revisar");
+        setEsError(!vigente);
+        setMensaje(
+          vigente
+            ? "Meta vigente comprobada. Puedes volver a guardar tu borrador."
+            : datos
+              ? "La meta cambió de estado. Conservamos tu borrador, pero no puedes editar la meta anterior."
+              : "No pudimos comprobar el estado de la meta. Reconsulta antes de guardar.",
         );
       } else if (datos?.meta) {
         setSituacion("existente");
@@ -74,7 +119,7 @@ export function MetaForm({
       setConsultando(false);
     }
   }
-  async function enviar(event: FormEvent) {
+  async function enviar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (ocupado.current || situacion !== "editar" || consultando) return;
     const enteros = (valor: string, minimo: number, maximo: number) =>
@@ -97,12 +142,22 @@ export function MetaForm({
         "El objetivo debe ser mayor que 0 y como máximo 100 horas (6000 minutos).";
     if (!enteros(dias, 1, 7))
       fallos.dias = "Introduce días enteros entre 1 y 7.";
+    Object.assign(fallos, validarHitosFormulario(hitos));
     setErrores(fallos);
     setRequestId(undefined);
     if (Object.keys(fallos).length) {
       setEsError(true);
       setMensaje("Revisa los campos indicados antes de guardar.");
       campos.current[Object.keys(fallos)[0] as Campo]?.focus();
+      if (Object.keys(fallos)[0].startsWith("hitos."))
+        event.currentTarget.elements.namedItem(
+          Object.keys(fallos)[0],
+        ) instanceof HTMLElement &&
+          (
+            event.currentTarget.elements.namedItem(
+              Object.keys(fallos)[0],
+            ) as HTMLElement
+          ).focus();
       return;
     }
     ocupado.current = true;
@@ -113,10 +168,23 @@ export function MetaForm({
         videojuego: videojuegoId,
         minutosObjetivo,
         diasPorSemana: Number(dias),
+        ...(hitosModificados || (!editando && hitos.length)
+          ? {
+              hitos: hitos.map((h) => ({
+                ...(editando && h._id ? { _id: h._id } : {}),
+                descripcion: h.descripcion.trim(),
+                porcentajeObjetivo: Number(h.porcentaje),
+              })),
+            }
+          : {}),
       });
       setSituacion("confirmada");
       setEsError(false);
-      setMensaje("Meta creada. Actualizando progreso…");
+      setMensaje(
+        editando
+          ? "Cambios guardados. Actualizando progreso…"
+          : "Meta creada. Actualizando progreso…",
+      );
       await leer(true);
     } catch (error) {
       setEsError(true);
@@ -124,6 +192,10 @@ export function MetaForm({
       if (error instanceof ErrorApi && error.status === 400) {
         const detalles: Errores = {};
         for (const detalle of error.detalles ?? []) {
+          if (
+            /^hitos\.\d+\.(descripcion|porcentajeObjetivo)$/.test(detalle.campo)
+          )
+            detalles[detalle.campo] = detalle.mensaje;
           if (detalle.campo === "diasPorSemana")
             detalles.dias = detalle.mensaje;
           if (detalle.campo === "minutosObjetivo")
@@ -135,13 +207,17 @@ export function MetaForm({
       } else if (error instanceof ErrorApi && error.status === 409) {
         setSituacion("revisar");
         setMensaje(
-          "Ya existe una meta activa. Estamos reconsultando el progreso; conservamos tu borrador.",
+          editando
+            ? "La meta cambió de estado. Estamos reconsultando el progreso; conservamos tu borrador."
+            : "Ya existe una meta activa. Estamos reconsultando el progreso; conservamos tu borrador.",
         );
         await leer(false);
       } else {
         setSituacion("revisar");
         setMensaje(
-          "No podemos confirmar si se creó la meta. Conservamos tus datos: reconsulta antes de volver a guardar.",
+          editando
+            ? "No podemos confirmar si se guardaron los cambios. Conservamos tu borrador: reconsulta antes de guardar otra vez."
+            : "No podemos confirmar si se creó la meta. Conservamos tus datos: reconsulta antes de volver a guardar.",
         );
       }
     } finally {
@@ -150,12 +226,14 @@ export function MetaForm({
   }
   return (
     <form
-      aria-label="Crear meta semanal"
+      aria-label={editando ? "Editar meta semanal" : "Crear meta semanal"}
       onSubmit={enviar}
       noValidate
       className="rounded-panel border border-borde bg-panel p-6 text-cuerpo"
     >
-      <h2 className="font-display text-seccion">Crear meta semanal</h2>
+      <h2 className="font-display text-seccion">
+        {editando ? "Editar meta semanal" : "Crear meta semanal"}
+      </h2>
       <p id={`${prefijo}-ayuda`} className="mt-2 text-ayuda text-texto-sec">
         Define un objetivo de 1 a 6000 minutos y de 1 a 7 días por semana. Se
         incluye la actividad ya registrada esta semana.
@@ -204,6 +282,17 @@ export function MetaForm({
           </div>
         ))}
       </fieldset>
+      <HitosEditor
+        hitos={hitos}
+        onChange={(nuevos) => {
+          setHitos(nuevos);
+          setHitosModificados(true);
+        }}
+        errores={errores}
+        disabled={
+          bloqueado || situacion === "confirmada" || situacion === "existente"
+        }
+      />
       {mensaje && (
         <div
           className={`mt-6 rounded-aviso border p-4 ${esError ? "border-error text-error" : "border-exito text-exito"}`}
@@ -223,7 +312,11 @@ export function MetaForm({
             disabled={bloqueado || situacion !== "editar"}
             className="min-h-11 rounded-pill border border-primario bg-primario px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-fondo disabled:opacity-70"
           >
-            {situacion === "enviando" ? "Guardando…" : "Guardar meta"}
+            {situacion === "enviando"
+              ? "Guardando…"
+              : editando
+                ? "Guardar cambios"
+                : "Guardar meta"}
           </button>
         )}
         {situacion === "revisar" && (

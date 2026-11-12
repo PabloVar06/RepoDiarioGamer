@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { metasApi } from "../api/metasApi";
 import type { ProgresoJuegoDTO, RachasDTO } from "../tipos";
+import { useActualizacionPeriodo } from "./useActualizacionPeriodo";
 
 function useConsulta<T>(
   id: string,
@@ -74,6 +75,12 @@ export function useIndicadoresVideojuego(id: string) {
     rachas.datos &&
     progreso.datos.fechaLocalActual !== rachas.datos.fechaLocalActual
   );
+  const fechaPeriodo = useRef<string>();
+  if (!desfase)
+    fechaPeriodo.current =
+      progreso.datos?.fechaLocalActual ??
+      rachas.datos?.fechaLocalActual ??
+      fechaPeriodo.current;
   const recargarTodo = useCallback(async () => {
     setSincronizacion("cargando");
     const [p, r] = await Promise.all([progreso.recargar(), rachas.recargar()]);
@@ -84,6 +91,7 @@ export function useIndicadoresVideojuego(id: string) {
   useEffect(() => {
     if (desfase && sincronizacion === "libre") void recargarTodo();
   }, [desfase, sincronizacion, recargarTodo]);
+  useActualizacionPeriodo(id, fechaPeriodo.current, recargarTodo);
   return {
     progreso,
     rachas,

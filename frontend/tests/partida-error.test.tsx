@@ -289,6 +289,11 @@ test("error al cargar catálogo conserva su mensaje y no se presenta como fallo 
     await screen.findByText("No pudimos cargar videojuegos"),
   ).toBeInTheDocument();
   expect(screen.queryByLabelText("Fecha de inicio")).not.toBeInTheDocument();
-  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "No pudimos cargar videojuegos",
+  );
+  expect(
+    screen.queryByText(/No pudimos guardar la partida/),
+  ).not.toBeInTheDocument();
   expect(enviados).toEqual([]);
 });

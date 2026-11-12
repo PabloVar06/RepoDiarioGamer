@@ -1,6 +1,7 @@
 import type {
   CrearMeta,
   DetalleErrorApi,
+  EditarMeta,
   HitoDTO,
   MetaDTO,
   ProgresoJuegoDTO,
@@ -166,6 +167,7 @@ async function solicitar<T>(
   validar: (valor: unknown) => valor is T,
   signal?: AbortSignal,
   datos?: unknown,
+  metodo?: "PUT" | "DELETE",
 ): Promise<T> {
   comprobarCancelacion(signal);
   let base: string;
@@ -180,14 +182,16 @@ async function solicitar<T>(
   }
   const accion =
     tipo === "meta"
-      ? "guardar la meta"
+      ? datos === undefined && metodo === undefined
+        ? "consultar la meta"
+        : "guardar la meta"
       : tipo === "rachas"
         ? "consultar las rachas"
         : "consultar el progreso";
   let respuesta: Response;
   try {
     respuesta = await fetch(`${base}${ruta}`, {
-      method: datos === undefined ? "GET" : "POST",
+      method: metodo ?? (datos === undefined ? "GET" : "POST"),
       headers: {
         Accept: "application/json",
         ...(datos === undefined ? {} : { "Content-Type": "application/json" }),
@@ -236,6 +240,59 @@ async function solicitar<T>(
 }
 
 export const metasApi = {
+  obtener(metaId: string, signal?: AbortSignal): Promise<MetaDTO> {
+    return solicitar(
+      `/metas/${encodeURIComponent(metaId)}`,
+      "meta",
+      200,
+      (valor): valor is MetaDTO =>
+        meta(valor) && valor._id.toLowerCase() === metaId.toLowerCase(),
+      signal,
+    );
+  },
+  activa(
+    videojuegoId: string,
+    signal?: AbortSignal,
+  ): Promise<{ meta: MetaDTO | null }> {
+    return solicitar(
+      `/videojuegos/${encodeURIComponent(videojuegoId)}/meta`,
+      "meta",
+      200,
+      (valor): valor is { meta: MetaDTO | null } =>
+        objeto(valor) &&
+        (valor.meta === null ||
+          (meta(valor.meta) &&
+            valor.meta.activa &&
+            valor.meta.videojuego.toLowerCase() ===
+              videojuegoId.toLowerCase())),
+      signal,
+    );
+  },
+  desactivar(metaId: string): Promise<void> {
+    return solicitar(
+      `/metas/${encodeURIComponent(metaId)}`,
+      "meta",
+      204,
+      (valor): valor is undefined => valor === undefined,
+      undefined,
+      undefined,
+      "DELETE",
+    );
+  },
+  actualizar(metaId: string, datos: EditarMeta): Promise<MetaDTO> {
+    return solicitar(
+      `/metas/${encodeURIComponent(metaId)}`,
+      "meta",
+      200,
+      (valor): valor is MetaDTO =>
+        meta(valor) &&
+        valor.activa &&
+        valor._id.toLowerCase() === metaId.toLowerCase(),
+      undefined,
+      datos,
+      "PUT",
+    );
+  },
   crear(datos: CrearMeta): Promise<MetaDTO> {
     return solicitar(
       "/metas",

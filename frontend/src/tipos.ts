@@ -61,6 +61,12 @@ export interface CrearMeta {
   hitos?: { descripcion: string; porcentajeObjetivo: number }[];
 }
 
+export interface EditarMeta {
+  minutosObjetivo: number;
+  diasPorSemana: number;
+  hitos?: { _id?: string; descripcion: string; porcentajeObjetivo: number }[];
+}
+
 export interface ProgresoJuegoDTO {
   videojuego: string;
   zonaHoraria: "America/Guayaquil";

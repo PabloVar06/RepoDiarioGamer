@@ -1,6 +1,7 @@
 import { useId } from "react";
 import type { ProgresoJuegoDTO } from "../tipos";
 import { formatearFechaCivil } from "../utils/fechas";
+import { HitosLista } from "./HitosLista";
 
 const formato = new Intl.NumberFormat("es-EC", { maximumFractionDigits: 2 });
 function porcentaje(valor: number) {
@@ -11,9 +12,13 @@ function porcentaje(valor: number) {
 export function ProgresoSemanal({
   datos,
   onCrearMeta,
+  onEditarMeta,
+  onDesactivarMeta,
 }: {
   datos: ProgresoJuegoDTO;
   onCrearMeta?: () => void;
+  onEditarMeta?: () => void;
+  onDesactivarMeta?: (disparador: HTMLButtonElement) => void;
 }) {
   const titulo = useId();
   const meta = datos.meta;
@@ -93,6 +98,25 @@ export function ProgresoSemanal({
               ? "Meta semanal cumplida"
               : "Meta semanal pendiente: requiere horas y días"}
           </p>
+          {onEditarMeta && (
+            <button
+              type="button"
+              onClick={onEditarMeta}
+              className="min-h-11 rounded-pill border border-acento px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
+            >
+              Editar meta
+            </button>
+          )}
+          {onDesactivarMeta && (
+            <button
+              type="button"
+              onClick={(e) => onDesactivarMeta(e.currentTarget)}
+              className="ml-0 min-h-11 rounded-pill border border-error px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-error sm:ml-4"
+            >
+              Desactivar meta
+            </button>
+          )}
+          <HitosLista hitos={datos.hitos} />
         </div>
       ) : (
         <div className="mt-6 rounded-aviso border border-borde p-4">

@@ -3,6 +3,9 @@ import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, vi } from "vitest";
 
 beforeEach(() => {
+  // Referencia sintética alineada con los DTO de UI; INT-03 controla su propio reloj.
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-11-15T17:00:00Z"));
   const root = document.createElement("div");
   root.id = "root";
   document.body.appendChild(root);
@@ -29,6 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
   document.getElementById("root")?.remove();
   vi.unstubAllGlobals();
 });

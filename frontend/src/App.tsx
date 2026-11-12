@@ -107,70 +107,53 @@ function Estados({
   loading,
   error,
   empty,
-  nebula = false,
   reintentar,
+  contexto = "videojuegos",
 }: {
   loading: boolean;
   error: string;
   empty: boolean;
-  nebula?: boolean;
   reintentar?: () => void;
+  contexto?: "videojuegos" | "partidas";
 }) {
-  if (nebula) {
-    const aviso = "rounded-aviso border border-borde bg-panel p-4 text-cuerpo";
-    if (loading)
-      return (
-        <p role="status" className={`${aviso} text-texto-sec`}>
-          Cargando datos…
-        </p>
-      );
-    if (error)
-      return (
-        <div role="alert" className={`${aviso} space-y-4 text-error`}>
-          <p>{error}</p>
-          {reintentar && (
-            <button
-              type="button"
-              onClick={reintentar}
-              className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
-            >
-              Reintentar
-            </button>
-          )}
-        </div>
-      );
-    if (empty)
-      return (
-        <div role="status" className={`${aviso} space-y-4 text-texto-sec`}>
-          <p>Todavía no hay datos. ¡Añade el primero!</p>
-          <p>Puedes añadir un videojuego o ajustar la búsqueda.</p>
-          <Link
-            to="/videojuegos/nuevo"
-            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
-          >
-            Añadir videojuego
-          </Link>
-        </div>
-      );
-    return null;
-  }
+  const aviso = "rounded-aviso border border-borde bg-panel p-4 text-cuerpo";
+  const accion =
+    "inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento";
   if (loading)
     return (
-      <p className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/60">
+      <p role="status" className={`${aviso} text-texto-sec`}>
         Cargando datos…
       </p>
     );
   if (error)
     return (
-      <p className="rounded-2xl border border-gamer-orange/50 bg-gamer-orange/10 px-4 py-3 text-sm text-[#ffac80]">
-        {error}
-      </p>
+      <div role="alert" className={`${aviso} space-y-4 text-error`}>
+        <p>{error}</p>
+        {reintentar && (
+          <button type="button" onClick={reintentar} className={accion}>
+            Reintentar
+          </button>
+        )}
+      </div>
     );
   if (empty)
     return (
-      <p className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white/60">
-        Todavía no hay datos. ¡Añade el primero!
-      </p>
+      <div role="status" className={`${aviso} space-y-4 text-texto-sec`}>
+        <p>Todavía no hay datos. ¡Añade el primero!</p>
+        <p>
+          {contexto === "partidas"
+            ? "Registra una partida para consultar tu historial."
+            : "Puedes añadir un videojuego o ajustar la búsqueda."}
+        </p>
+        <Link
+          to={
+            contexto === "partidas" ? "/partidas/nueva" : "/videojuegos/nuevo"
+          }
+          className={accion}
+        >
+          {contexto === "partidas" ? "Registrar partida" : "Añadir videojuego"}
+        </Link>
+      </div>
     );
   return null;
 }
@@ -252,7 +235,6 @@ function ListaJuegos() {
         loading={loading}
         error={error}
         empty={!loading && !error && !items.length}
-        nebula
         reintentar={cargar}
       />
       <div className="cards grid grid-cols-1 gap-6 lg:grid-cols-2 2xl:grid-cols-3">
@@ -374,24 +356,24 @@ function FormJuego() {
     }
   }
   const field =
-    "mt-1.5 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2.5 text-sm outline-none focus:border-gamer-blue";
+    "mt-2 min-h-11 w-full min-w-0 border border-borde bg-fondo px-4 py-2 text-cuerpo text-texto placeholder:text-texto-sec";
   return (
     <section className="formpage mx-auto max-w-2xl">
-      <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
+      <p className="eyebrow mb-4 text-ayuda font-semibold uppercase tracking-wide text-[color:var(--color-destacado)]">
         BIBLIOTECA / {id ? "EDITAR" : "NUEVO"}
       </p>
-      <h1 className="mb-6 font-display text-3xl font-black">
+      <h1 className="mb-6 font-display text-pantalla">
         {id ? "Editar videojuego" : "Añadir videojuego"}
       </h1>
       <Estados loading={loading} error={error} empty={false} />
       <form
         onSubmit={submit}
-        className="form space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-float md:p-8"
+        className="form space-y-4 rounded-panel border border-borde bg-panel p-6"
       >
-        <label className="block text-sm font-semibold">
+        <label className="block text-cuerpo">
           Nombre
           <input
-            className={field}
+            className={`${field} rounded-pill`}
             required
             maxLength={120}
             value={nombre}
@@ -400,10 +382,10 @@ function FormJuego() {
           />
         </label>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm font-semibold">
+          <label className="block text-cuerpo">
             Plataforma
             <select
-              className={field}
+              className={`${field} rounded-pill`}
               value={plataforma}
               onChange={(e) => setPlataforma(e.target.value)}
             >
@@ -412,10 +394,10 @@ function FormJuego() {
               ))}
             </select>
           </label>
-          <label className="block text-sm font-semibold">
+          <label className="block text-cuerpo">
             Género
             <select
-              className={field}
+              className={`${field} rounded-pill`}
               value={genero}
               onChange={(e) => setGenero(e.target.value)}
             >
@@ -425,10 +407,10 @@ function FormJuego() {
             </select>
           </label>
         </div>
-        <label className="block text-sm font-semibold">
+        <label className="block text-cuerpo">
           Estado
           <select
-            className={field}
+            className={`${field} rounded-pill`}
             value={estado}
             onChange={(e) => setEstado(e.target.value)}
           >
@@ -437,13 +419,13 @@ function FormJuego() {
             ))}
           </select>
         </label>
-        <label className="block text-sm font-semibold">
+        <label className="block text-cuerpo">
           Logros iniciales{" "}
-          <small className="font-normal text-white/50">
+          <small className="block mt-2 text-ayuda font-normal text-texto-sec">
             (uno por línea; formato: nombre|descripción)
           </small>
           <textarea
-            className={field}
+            className={`${field} rounded-aviso`}
             value={logros}
             onChange={(e) => setLogros(e.target.value)}
             rows={4}
@@ -454,12 +436,15 @@ function FormJuego() {
         </label>
         <div className="flex flex-wrap items-center gap-4 pt-2">
           <button
-            className="button rounded-full bg-gamer-orange px-5 py-2.5 text-sm font-bold shadow-orangeglow disabled:opacity-50"
+            className="button inline-flex min-h-11 items-center justify-center rounded-pill bg-primario px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-fondo disabled:opacity-50"
             disabled={loading}
           >
             {id ? "Guardar cambios" : "Crear videojuego"}
           </button>
-          <Link className="text-sm font-semibold text-gamer-blue" to="/">
+          <Link
+            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
+            to="/"
+          >
             Cancelar
           </Link>
         </div>
@@ -474,6 +459,7 @@ function ListaPartidas() {
   const [error, setError] = useState("");
   function load() {
     setLoading(true);
+    setError("");
     partidasApi
       .listar()
       .then(setPs)
@@ -502,13 +488,13 @@ function ListaPartidas() {
     <>
       <div className="sectionhead mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
+          <p className="eyebrow mb-4 text-ayuda font-semibold uppercase tracking-wide text-[color:var(--color-destacado)]">
             HISTORIAL COMPLETO
           </p>
-          <h1 className="font-display text-3xl font-black">Mis partidas</h1>
+          <h1 className="font-display text-pantalla">Mis partidas</h1>
         </div>
         <Link
-          className="button inline-flex rounded-full bg-gamer-orange px-5 py-2.5 text-sm font-bold shadow-orangeglow"
+          className="button inline-flex min-h-11 items-center justify-center rounded-pill bg-primario px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-fondo"
           to="/partidas/nueva"
         >
           + Nueva partida
@@ -518,8 +504,10 @@ function ListaPartidas() {
         loading={loading}
         error={error}
         empty={!loading && !error && !ps.length}
+        contexto="partidas"
+        reintentar={load}
       />
-      <section className="panel rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-float md:p-6">
+      <section className="panel min-w-0 rounded-panel border border-borde bg-panel p-6">
         {!loading &&
           !error &&
           ps.map((p) => {
@@ -527,14 +515,14 @@ function ListaPartidas() {
               typeof p.videojuego === "string" ? null : p.videojuego;
             return (
               <div
-                className="flex items-center justify-between gap-3 border-t border-white/10 py-3 first:border-0"
+                className="flex flex-wrap items-center justify-between gap-4 border-t border-borde py-4 first:border-0"
                 key={p._id}
               >
-                <div>
-                  <b className="block text-sm">
+                <div className="min-w-0 flex-1">
+                  <b className="block text-cuerpo">
                     {juego ? (
                       <Link
-                        className="hover:text-gamer-blue"
+                        className="inline-flex min-h-11 items-center break-words text-acento hover:underline"
                         to={`/videojuegos/${juego._id}`}
                       >
                         {juego.nombre}
@@ -543,21 +531,21 @@ function ListaPartidas() {
                       "Videojuego"
                     )}
                   </b>
-                  <small className="text-white/50">
+                  <small className="block break-words text-ayuda text-texto-sec">
                     {formatearFechaCivil(p.fecha)} · {p.notas || "Sin notas"}
                   </small>
                 </div>
                 <div className="text-right">
-                  <b className="block text-sm text-gamer-green">
+                  <b className="block text-cuerpo font-semibold text-exito">
                     {p.duracionMinutos} min
                   </b>
-                  <small className="block text-white/50">
+                  <small className="block break-words text-ayuda text-texto-sec">
                     {p.porcentajeAvance}% avance
                   </small>
                   <button
                     type="button"
                     onClick={() => eliminarRegistro(p._id)}
-                    className="mt-1 text-xs font-semibold text-gamer-orange hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-gamer-blue"
+                    className="mt-2 inline-flex min-h-11 items-center justify-center rounded-pill border border-error px-4 py-2 text-[length:var(--texto-destacado)] font-semibold text-error"
                     aria-label="Eliminar partida"
                   >
                     Eliminar
@@ -608,15 +596,13 @@ function FormPartida() {
     }
   }
   const field =
-    "mt-1.5 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-2.5 text-sm outline-none focus:border-gamer-blue";
+    "mt-2 min-h-11 w-full min-w-0 border border-borde bg-fondo px-4 py-2 text-cuerpo text-texto placeholder:text-texto-sec";
   return (
     <section className="formpage mx-auto max-w-2xl">
-      <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
+      <p className="eyebrow mb-4 text-ayuda font-semibold uppercase tracking-wide text-[color:var(--color-destacado)]">
         HISTORIAL / NUEVA SESIÓN
       </p>
-      <h1 className="mb-6 font-display text-3xl font-black">
-        Registrar partida
-      </h1>
+      <h1 className="mb-6 font-display text-pantalla">Registrar partida</h1>
       <Estados
         loading={loading}
         error={errorCarga}
@@ -624,22 +610,22 @@ function FormPartida() {
       />
       {!loading && !errorCarga && juegos.length > 0 && (
         <form
-          className="form space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-float md:p-8"
+          className="form space-y-4 rounded-panel border border-borde bg-panel p-6"
           onSubmit={submit}
         >
           {errorEnvio && (
             <p
               role="alert"
-              className="rounded-aviso border border-borde bg-panel p-4 text-sm text-error"
+              className="rounded-aviso border border-borde bg-panel p-4 text-cuerpo text-error"
             >
               No pudimos guardar la partida. {errorEnvio} Revisa los datos o la
               conexión y vuelve a intentarlo.
             </p>
           )}
-          <label className="block text-sm font-semibold">
+          <label className="block text-cuerpo">
             Videojuego
             <select
-              className={field}
+              className={`${field} rounded-pill`}
               required
               value={videojuego}
               onChange={(e) => setVideojuego(e.target.value)}
@@ -652,10 +638,10 @@ function FormPartida() {
               ))}
             </select>
           </label>
-          <label className="block text-sm font-semibold">
+          <label className="block text-cuerpo">
             Fecha de inicio
             <input
-              className={field}
+              className={`${field} rounded-pill`}
               required
               type="date"
               min="0001-01-01"
@@ -665,10 +651,10 @@ function FormPartida() {
             />
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="block text-sm font-semibold">
+            <label className="block text-cuerpo">
               Duración (minutos)
               <input
-                className={field}
+                className={`${field} rounded-pill`}
                 type="number"
                 min="1"
                 max="1440"
@@ -677,10 +663,10 @@ function FormPartida() {
                 onChange={(e) => setDuracion(e.target.value)}
               />
             </label>
-            <label className="block text-sm font-semibold">
+            <label className="block text-cuerpo">
               Avance (%)
               <input
-                className={field}
+                className={`${field} rounded-pill`}
                 type="number"
                 min="0"
                 max="100"
@@ -690,10 +676,10 @@ function FormPartida() {
               />
             </label>
           </div>
-          <label className="block text-sm font-semibold">
+          <label className="block text-cuerpo">
             Notas (opcional)
             <textarea
-              className={field}
+              className={`${field} rounded-aviso`}
               rows={3}
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
@@ -702,13 +688,13 @@ function FormPartida() {
           </label>
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <button
-              className="button rounded-full bg-gamer-orange px-5 py-2.5 text-sm font-bold shadow-orangeglow disabled:opacity-50"
+              className="button inline-flex min-h-11 items-center justify-center rounded-pill bg-primario px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-fondo disabled:opacity-50"
               disabled={!juegos.length}
             >
               Guardar partida
             </button>
             <Link
-              className="text-sm font-semibold text-gamer-blue"
+              className="inline-flex min-h-11 items-center justify-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
               to="/partidas"
             >
               Cancelar
@@ -778,10 +764,13 @@ export default function App() {
             path="*"
             element={
               <section>
-                <h1 className="font-display text-3xl font-black">
+                <h1 className="font-display text-pantalla">
                   Página no encontrada
                 </h1>
-                <Link className="mt-3 inline-block text-gamer-blue" to="/">
+                <Link
+                  className="mt-4 inline-flex min-h-11 items-center rounded-pill border border-acento px-6 py-2 text-[length:var(--texto-destacado)] font-semibold text-acento"
+                  to="/"
+                >
                   Volver al inicio
                 </Link>
               </section>
