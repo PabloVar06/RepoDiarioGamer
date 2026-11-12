@@ -102,8 +102,10 @@ las resoluciones anteriores no se reabren por esta regularización documental.
 ## 4. Contratos del servicio metasApi.ts
 
 Backend es la fuente canónica de DTO y estados HTTP; la tabla siguiente DEBE
-mantenerse alineada con la sección 5 de la spec backend. No hay endpoints existentes
-de metas actualmente. Se proponen estos métodos, sin escribir su implementación:
+mantenerse alineada con la sección 5 de la spec backend. Al 12 de noviembre de
+2026 existen los endpoints backend de metas/progreso; falta el de rachas. En el
+cliente solo está implementado `metasApi.progreso`; los demás métodos de esta
+tabla siguen previstos para sus tickets. App.tsx todavía no consume metasApi.
 
 | Método de servicio       | Contrato HTTP                       | Resultado                                      |
 | ------------------------ | ----------------------------------- | ---------------------------------------------- |
@@ -289,7 +291,8 @@ es complementario. Configuración y resultados de HAB-01 constan en
 ## 10. Tabla ticket → archivos previstos
 
 N = nuevo y M = modificación respecto al plan original. HAB-01 está cerrado y
-HAB-05 implementado, pendiente de cierre; las demás filas conservan su planificación aprobada.
+HAB-05 implementado, pendiente de cierre. FE-01 y VIS-01 tienen únicamente los
+cortes técnicos acreditados abajo; el resto conserva su planificación aprobada.
 Rutas repetidas indican trabajo incremental.
 
 | Ticket                      | Archivos previstos                                                                                                                                                                                                                                                               | Alcance / evidencia                                                                                                                           |
@@ -318,6 +321,14 @@ HAB-05 (1e528cb), pendiente de cierre; la validación se realiza al solicitar da
 según el plan aprobado y su evidencia. Esta nota de estado no cambia el contrato.
 La creación inicial de metasApi.ts corresponde a FE-01, no a HAB-05. Los métodos
 se incorporan progresivamente en los cortes FE posteriores, reutilizando baseUrl.ts.
+El [corte técnico FE-01](../verificaciones/E2-FE-01-servicio.md) acredita tipos,
+GET de progreso, validación de DTO, errores y cancelación del cliente; no crea
+componentes, hooks ni integración con Detalle. La
+[base VIS-01](../verificaciones/E2-VIS-01.md) acredita tokens/reglas globales y
+verificación de navegador limitada; no acredita VIS-02/03 ni carga de las fuentes
+previstas. Las clases antiguas de App.tsx todavía cubren gran parte del tema.
+El [estado consolidado](../verificaciones/E2-estado-implementacion.md) distingue
+esas pruebas técnicas de la aceptación UI que continúa pendiente.
 El [backlog](../backlog/E2-metas-y-rachas.md#14-matriz-de-trazabilidad-y-verificación)
 relaciona decisiones, historias, AC, tickets y método de verificación.
 

@@ -141,7 +141,14 @@ test("Progreso HTTP: límites semanales, mismo día y juegos separados sin meta"
   await partida(game._id, "2026-11-09", 30, 10);
   await partida(game._id, "2026-11-09", 60, 20);
   await partida(game._id, "2026-11-15", 15, 15);
-  await partida(game._id, "2026-11-16", 1440, 100);
+  // Dato futuro legado: la nueva API de escritura no debe admitirlo (P02).
+  await database!.assertConnection();
+  await Partida.collection.insertOne({
+    videojuego: new Types.ObjectId(game._id),
+    fecha: new Date("2026-11-16T00:00:00Z"),
+    duracionMinutos: 1440,
+    porcentajeAvance: 100,
+  });
   await partida(otro._id, "2026-11-09", 999, 99);
   const resultado = await progreso(game._id);
   assert.equal(resultado.minutosSemana, 105);
@@ -238,6 +245,7 @@ test("Progreso HTTP: hitos usan máximo acumulado y cambian al borrar la sesión
 test("Progreso HTTP: una referencia temporal por consulta y cambio domingo/lunes en Guayaquil", async () => {
   const game = await juego();
   await partida(game._id, "2026-11-15", 90);
+  lecturasReloj = 0; // Medir las dos consultas, sin incluir la nueva escritura.
   ahora = new Date("2026-11-16T04:59:59Z");
   assert.equal((await progreso(game._id)).minutosSemana, 90);
   ahora = new Date("2026-11-16T05:00:00Z");

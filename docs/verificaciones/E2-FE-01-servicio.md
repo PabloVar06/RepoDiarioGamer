@@ -10,7 +10,7 @@ abierto**: no se implementó todavía el panel de progreso ni sus estados visual
 
 Ticket: E2-FE-01 — Mostrar actividad semanal y avance sin meta.
 Se aplican [spec frontend, §4](../specs/E2-frontend.md#4-contratos-del-servicio-metasapits),
-[contrato backend, §5](../specs/E2-backend.md#5-contratos-http-propuestos) y
+[contrato backend, §5](../specs/E2-backend.md#5-contratos-http-aprobados) y
 [backlog](../backlog/E2-metas-y-rachas.md#8-tickets-funcionales-frontend).
 La spec estaba versionada antes del código; HEAD al comenzar era `a6663ff`.
 

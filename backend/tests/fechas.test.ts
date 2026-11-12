@@ -1,6 +1,28 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { obtenerFechaLocal, obtenerSemana } from "../src/services/fechas";
+import {
+  fechaCivilUTC,
+  obtenerFechaLocal,
+  obtenerSemana,
+} from "../src/services/fechas";
+
+for (const dia of ["0001-01-01", "0099-12-31", "2000-02-29", "9999-12-31"]) {
+  test(`Fecha civil: ${dia} conserva año y día a medianoche UTC`, () => {
+    assert.equal(fechaCivilUTC(dia).toISOString(), `${dia}T00:00:00.000Z`);
+  });
+}
+
+for (const dia of [
+  "2026-02-30",
+  "2025-02-29",
+  "0000-01-01",
+  "10000-01-01",
+  "2026-11-15T23:30:00-05:00",
+]) {
+  test(`Fecha civil: rechaza ${dia} en vez de normalizarlo`, () => {
+    assert.throws(() => fechaCivilUTC(dia));
+  });
+}
 
 test("Calendario: hoy cambia a las 05:00 UTC de Guayaquil", () => {
   assert.equal(

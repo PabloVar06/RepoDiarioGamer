@@ -15,10 +15,10 @@ before(
   async () => {
     database = await startTemporaryMongo();
     await database.assertConnection();
-    server = crearApp({ frontendUrl: "http://frontend.example.test" }).listen(
-      0,
-      "127.0.0.1",
-    );
+    server = crearApp({
+      frontendUrl: "http://frontend.example.test",
+      reloj: () => new Date("2026-11-15T17:00:00Z"),
+    }).listen(0, "127.0.0.1");
     await once(server, "listening");
     base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   },

@@ -21,6 +21,10 @@ la aprobación documental no acredita implementación ni cierre.
   conserva únicamente el cotejo académico externo pendiente.
 - Estado de tickets, matriz criterio → verificación y precedencia en Git:
   [backlog, secciones 13–15](../backlog/E2-metas-y-rachas.md#13-estado-actual-y-siguiente-paso).
+- Revisión de implementación del 12 de noviembre de 2026:
+  [estado comprobado y plan incremental](../verificaciones/E2-estado-implementacion.md).
+  El backend de metas/progreso y la base técnica frontend tienen evidencia parcial;
+  los componentes E2 y la adaptación completa de las vistas siguen pendientes.
 
 No se encontró una ficha de hechos independiente ni la lista académica original
 de ocho huecos. H1–H8 son los identificadores de trabajo discutidos y aprobados
@@ -218,3 +222,10 @@ Las resoluciones completas permanecen en la sección 2 de las specs
 actualiza su estado sin sustituir contratos ni solicitar de nuevo su aprobación.
 PA01 limita la certificación académica, no bloquea automáticamente todos los
 tickets técnicos. Las dependencias y la preparación de cada ticket siguen siendo exigibles.
+
+El cotejo PA01 incluye los nombres mencionados del enunciado: `horasSemanales`
+frente a `minutosObjetivo` y `/progreso-semanal` frente a `/progreso`. Sin la ficha
+original no se certifica su equivalencia académica. Siguen vigentes los contratos
+aprobados de las specs: minutos enteros canónicos y
+GET `/api/videojuegos/:id/progreso`; la UI expresa el objetivo en horas/minutos.
+Esta revisión no autoriza renombrar campos, crear alias ni migrar datos.

@@ -116,9 +116,11 @@ Para modificar/desactivar una meta se propone una escritura condicional a su
 estado activo, evitando read-modify-save que reactive una meta concurrentemente
 desactivada. No se introduce un sistema general de versionado u optimistic locking.
 
-## 5. Contratos HTTP propuestos
+## 5. Contratos HTTP aprobados
 
-Estas rutas son nuevas propuestas de contrato, no endpoints ya implementados.
+Estado comprobado al 12 de noviembre de 2026: las rutas de metas y progreso
+de esta tabla están implementadas; GET `/api/rachas` sigue pendiente. Esta tabla
+conserva los contratos aprobados y no acredita por sí sola el cierre de tickets.
 
 | Método y ruta                       | Entrada             | Éxito                                                                                                |
 | ----------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------- |
@@ -171,8 +173,10 @@ cambio de día, la UI DEBE detectar las fechas distintas y reconsultar el conjun
 
 ## 6. Funciones puras e interfaces internas
 
-Los nombres siguientes son interfaces previstas, no código creado. Las funciones
-puras reciben valores simples y no dependen de Mongoose, Express, React,
+Los nombres siguientes describen las interfaces aprobadas. Las funciones de
+fecha, actividad, cumplimiento e hitos tienen implementación y pruebas;
+`calcularRachasGlobales` sigue pendiente. Las funciones puras reciben valores
+simples y no dependen de Mongoose, Express, React,
 variables de entorno ni del reloj global. NO mutan sus entradas.
 
 | Función prevista           | Entrada → salida / responsabilidad                                                                              |
@@ -288,8 +292,13 @@ y las pruebas sin emitir archivos; es complementario a los tests funcionales.
 
 ## 10. Tabla ticket → archivos previstos
 
-N = nuevo, M = modificar, respecto al plan original. La parte de HAB-01 ya tiene
-implementación y evidencia; las filas restantes mantienen su planificación aprobada.
+N = nuevo, M = modificar, respecto al plan original. Las filas conservan el mapa
+de archivos aprobado; no constituyen un inventario de archivos ya creados.
+HAB-01 está cerrado. BE-01/03/05/06/07 tienen funcionalidad backend verificada,
+con cierre pendiente. HAB-03 y BE-02 siguen pendientes; disponer de helpers de
+fecha no acredita la escritura civil de HAB-03. La
+[revisión de implementación](../verificaciones/E2-estado-implementacion.md)
+enlaza archivos y tests reales, incluidos los nombres que difieren del plan.
 
 | Ticket                 | Archivos previstos                                                                                                                                                                                                                                                                                                                                                                    | Alcance / evidencia                                                                         |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -314,6 +323,14 @@ incidentalmente el resto de T1–T5/D1–D3.
 Estado de HAB-01: por instrucción posterior explícita del usuario, T3 se mantiene
 pendiente. La integración caracteriza el JSON malformado como 500 sin requestId,
 sin corregirlo ni dar por cumplido el contrato futuro de errores E2.
+
+Evidencia posterior de implementación: [modelo Meta](../verificaciones/E2-BE-03-modelo.md),
+[CRUD Meta](../verificaciones/E2-BE-03-crud.md) y
+[progreso semanal](../verificaciones/E2-BE-01-progreso.md). Son registros de
+cortes sucesivos: las carencias de cálculo descritas en la evidencia inicial del
+CRUD se cubren parcialmente en la posterior de progreso. Persisten T3, HAB-03,
+rachas e integración/cascada de metas según el backlog. No se cierran tickets
+por esta actualización documental ni se modifican los criterios de la spec.
 
 ## 11. Restricciones y aprobación
 

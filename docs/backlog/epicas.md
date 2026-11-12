@@ -7,6 +7,13 @@ Estado: **PRD, épicas y backlog aprobados en conversación** y versionados en
 y verificado, pendiente de autorización de cierre. Los demás tickets no se
 consideran ejecutados por tener planificación; requieren su plan aprobado.
 
+Actualización de estado: 12 de noviembre de 2026. Hay código y evidencia de
+metas/progreso backend en 03f8564/a6663ff y cortes técnicos de FE-01/VIS-01 en
+db3efbe/0fedabd. No se acreditan su cierre ni la interfaz funcional E2. Rachas,
+componentes React E2 e integración visual de vistas siguen pendientes. Véase la
+[revisión de implementación](../verificaciones/E2-estado-implementacion.md), sin
+cambiar las reglas, dependencias o aceptación de estas épicas.
+
 Fuentes: [PRD](../prd/savepoint.md), [diagnóstico](../diagnostico.md) y
 [DESIGN.md](../../DESIGN.md). Los identificadores H, AC y PA corresponden al PRD.
 
