@@ -9,6 +9,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import App from "../src/App";
 import type { Partida, Videojuego } from "../src/tipos";
+import { progresoE2, rachasE2 } from "./fixtures/e2";
 
 vi.mock("gsap", () => ({ default: { fromTo: vi.fn(), to: vi.fn() } }));
 
@@ -143,6 +144,14 @@ beforeEach(() => {
         porcentajeAvanceActual: 25,
       };
     else if (path === "/api/partidas") body = [];
+    else if (path === `/api/videojuegos/${juego._id}/progreso`)
+      body = progresoE2({
+        minutosSemana: partidas.length ? 90 : 0,
+        horasSemana: partidas.length ? 1.5 : 0,
+        diasJugados: partidas.length ? 1 : 0,
+        porcentajeAvanceActual: partidas.length ? 25 : 0,
+      });
+    else if (path === "/api/rachas") body = rachasE2();
     else throw new Error(`Ruta no simulada: ${path}`);
     return new Response(JSON.stringify(body));
   });

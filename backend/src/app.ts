@@ -6,6 +6,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { videojuegosRouter } from "./routes/videojuegos.routes";
 import { partidasRouter } from "./routes/partidas.routes";
 import { metasRouter } from "./routes/metas.routes";
+import { rachasRouter } from "./routes/rachas.routes";
 import { ApiError } from "./apiError";
 export interface AppConfig {
   frontendUrl: string;
@@ -22,15 +23,16 @@ export function crearApp(config: AppConfig): Express {
       credentials: false,
     }),
   );
-  app.use(express.json());
   app.use(requestId);
   app.use(logger);
+  app.use(express.json());
   app.get("/api/salud", (req: Request, res: Response) =>
     res.json({ estado: "ok", requestId: req.id }),
   );
   app.use("/api/videojuegos", videojuegosRouter);
   app.use("/api/partidas", partidasRouter);
   app.use("/api/metas", metasRouter);
+  app.use("/api/rachas", rachasRouter);
   app.use((req, res, next) =>
     next(
       new ApiError(404, `Ruta no encontrada: ${req.method} ${req.originalUrl}`),

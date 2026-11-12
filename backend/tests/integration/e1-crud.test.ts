@@ -439,7 +439,7 @@ test("E1 HTTP: IDs mal formados son 400 y recursos inexistentes son 404", async 
   });
 });
 
-test("T3 pendiente: observar JSON malformado sin corregir su respuesta actual", async (t) => {
+test("T3: JSON malformado devuelve 400 con requestId sin modificar E1", async () => {
   assert.ok(database);
   await database.assertConnection();
   const before = await request("GET", "/api/videojuegos", 200);
@@ -450,13 +450,9 @@ test("T3 pendiente: observar JSON malformado sin corregir su respuesta actual", 
     signal: AbortSignal.timeout(10_000),
   });
   const body = await response.json();
-  // Es una caracterización de deuda, NO aceptación del contrato deseado de E2.
-  assert.equal(response.status, 500);
-  assert.equal(body.error, "Error interno del servidor");
-  assert.equal(body.requestId, undefined);
-  assert.equal(response.headers.get("x-request-id"), null);
+  assert.equal(response.status, 400);
+  assert.match(body.error, /JSON/i);
+  assert.match(body.requestId, /^[0-9a-f-]{36}$/);
+  assert.equal(response.headers.get("x-request-id"), body.requestId);
   assert.deepEqual(await request("GET", "/api/videojuegos", 200), before);
-  t.diagnostic(
-    "T3 sigue pendiente: JSON malformado devuelve 500 sin requestId; no se modificó E1.",
-  );
 });

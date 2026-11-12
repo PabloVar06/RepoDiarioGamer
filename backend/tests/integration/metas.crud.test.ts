@@ -6,6 +6,7 @@ import type { AddressInfo } from "node:net";
 import { Types } from "mongoose";
 import { crearApp } from "../../src/app";
 import { Meta } from "../../src/modelos/Meta.model";
+import { Partida } from "../../src/modelos/Partida.model";
 import { inicializarMetas } from "../../src/services/metas.service";
 import { startTemporaryMongo } from "./temporary-mongo";
 
@@ -456,7 +457,7 @@ test("Meta HTTP: PUT que gana antes de DELETE conserva edición e inactiva al fi
   assert.equal(guardada.activa, false);
 });
 
-test("T3 pendiente: el parser rechaza JSON escalar antes de validar Meta", async (t) => {
+test("T3: el parser rechaza JSON escalar con 400 y requestId sin crear metas", async () => {
   await database!.assertConnection();
   const antes = await Meta.countDocuments();
   for (const body of ["null", "true", '"texto"']) {
@@ -467,13 +468,67 @@ test("T3 pendiente: el parser rechaza JSON escalar antes de validar Meta", async
       signal: AbortSignal.timeout(10_000),
     });
     const result = await response.json();
-    assert.equal(response.status, 500);
-    assert.equal(result.requestId, undefined);
-    assert.equal(response.headers.get("x-request-id"), null);
+    assert.equal(response.status, 400);
+    assert.match(result.requestId, /^[0-9a-f-]{36}$/);
+    assert.equal(response.headers.get("x-request-id"), result.requestId);
   }
   assert.equal(await Meta.countDocuments(), antes);
-  t.diagnostic(
-    "Caracterización de T3, no aceptación de 400 para cuerpos escalares; no se corrigió el parser.",
+});
+
+test("T3: cuerpo excesivo devuelve 413 con requestId sin escrituras", async () => {
+  await database!.assertConnection();
+  const antes = await Meta.countDocuments();
+  const response = await fetch(`${base}/api/metas`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ descripcion: "x".repeat(110_000) }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  const result = await response.json();
+  assert.equal(response.status, 413);
+  assert.match(result.error, /grande|límite/i);
+  assert.match(result.requestId, /^[0-9a-f-]{36}$/);
+  assert.equal(response.headers.get("x-request-id"), result.requestId);
+  assert.equal(result.stack, undefined);
+  assert.equal(result.body, undefined);
+  assert.equal(await Meta.countDocuments(), antes);
+});
+
+test("INT-01: borrar juego elimina todas sus metas y partidas y conserva otro juego", async () => {
+  const game = await juego();
+  const otro = await juego();
+  const historica = await crear(game._id);
+  await http("DELETE", `/api/metas/${historica._id}`, 204);
+  const activa = await crear(game._id);
+  const ajena = await crear(otro._id);
+  for (const videojuego of [game._id, otro._id]) {
+    await http("POST", "/api/partidas", 201, {
+      videojuego,
+      fecha: "2026-11-09",
+      duracionMinutos: 45,
+      porcentajeAvance: 30,
+    });
+  }
+  const resumenAjeno = await http(
+    "GET",
+    `/api/videojuegos/${otro._id}/resumen`,
+    200,
+  );
+  await http("DELETE", `/api/videojuegos/${game._id}`, 204);
+  await database!.assertConnection();
+  assert.equal(await Meta.countDocuments({ videojuego: game._id }), 0);
+  assert.equal(await Partida.countDocuments({ videojuego: game._id }), 0);
+  for (const id of [activa._id, historica._id])
+    await http("GET", `/api/metas/${id}`, 404);
+  await http("GET", `/api/videojuegos/${game._id}`, 404);
+  assert.deepEqual(await http("GET", `/api/metas/${ajena._id}`, 200), ajena);
+  assert.deepEqual(
+    await http("GET", `/api/videojuegos/${otro._id}/resumen`, 200),
+    resumenAjeno,
+  );
+  assert.equal(
+    (await http("GET", `/api/videojuegos/${otro._id}/partidas`, 200)).length,
+    1,
   );
 });
 

@@ -14,8 +14,25 @@ export function errorHandler(
   req: Request,
   res: Response,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: NextFunction
+  next: NextFunction,
 ): void {
+  // Errores conocidos del parser, sin devolver ni registrar el cuerpo recibido.
+  if (err instanceof Error && "type" in err) {
+    if (err.type === "entity.parse.failed") {
+      res.status(400).json({
+        error: "El cuerpo debe ser un objeto JSON válido",
+        requestId: req.id,
+      });
+      return;
+    }
+    if (err.type === "entity.too.large") {
+      res.status(413).json({
+        error: "El cuerpo supera el límite permitido",
+        requestId: req.id,
+      });
+      return;
+    }
+  }
   // 1) Errores de negocio propios.
   if (err instanceof ApiError) {
     res.status(err.status).json({ error: err.message, requestId: req.id });
@@ -39,5 +56,7 @@ export function errorHandler(
 
   // 4) Cualquier otro error (de conexión, de servidor, inesperado).
   console.error(`[${new Date().toISOString()}] id=${req.id} ERROR:`, err);
-  res.status(500).json({ error: "Error interno del servidor", requestId: req.id });
+  res
+    .status(500)
+    .json({ error: "Error interno del servidor", requestId: req.id });
 }

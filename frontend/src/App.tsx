@@ -10,8 +10,9 @@ import {
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { videojuegosApi } from "./api/videojuegosApi";
 import { partidasApi } from "./api/partidasApi";
-import type { Videojuego, Partida, Resumen } from "./tipos";
+import type { Videojuego, Partida } from "./tipos";
 import "./index.css";
+import { DetalleVideojuego } from "./pages/DetalleVideojuego";
 import gsap from "gsap";
 import { formatearFechaCivil, hoyGuayaquil } from "./utils/fechas";
 
@@ -33,16 +34,6 @@ const navClass = ({ isActive }: { isActive: boolean }) =>
       ? "border-acento bg-panel text-texto"
       : "border-transparent text-texto-sec hover:bg-panel hover:text-texto"
   }`;
-
-function pillClass(estado: string) {
-  const tones: Record<string, string> = {
-    Jugando: "bg-gamer-green/15 text-gamer-green border-gamer-green/35",
-    Completado: "bg-gamer-blue/15 text-[#9dc4ff] border-gamer-blue/35",
-    Pausado: "bg-gamer-yellow/15 text-gamer-yellow border-gamer-yellow/35",
-    Abandonado: "bg-gamer-orange/15 text-[#ffad81] border-gamer-orange/35",
-  };
-  return `inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${tones[estado] ?? "border-white/15 bg-white/10"}`;
-}
 
 function Layout({ children }: { children: ReactNode }) {
   return (
@@ -477,219 +468,6 @@ function FormJuego() {
   );
 }
 
-function Detalle() {
-  const { id = "" } = useParams();
-  const [j, setJ] = useState<Videojuego | null>(null);
-  const [ps, setPs] = useState<Partida[]>([]);
-  const [r, setR] = useState<Resumen | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  async function cargar() {
-    setLoading(true);
-    setError("");
-    try {
-      const [juego, partidas, resumen] = await Promise.all([
-        videojuegosApi.obtener(id),
-        videojuegosApi.partidas(id),
-        videojuegosApi.resumen(id),
-      ]);
-      setJ(juego);
-      setPs(partidas);
-      setR(resumen);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }
-  useEffect(() => {
-    cargar();
-  }, [id]);
-  async function logro(lid: string, obtenido: boolean) {
-    try {
-      await videojuegosApi.marcarLogro(id, lid, obtenido);
-      await cargar();
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
-  async function eliminarRegistro(partidaId: string) {
-    if (
-      !window.confirm(
-        "¿Eliminar esta partida? Esta acción no se puede deshacer.",
-      )
-    )
-      return;
-    try {
-      await partidasApi.eliminar(partidaId);
-      await cargar();
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
-  return (
-    <>
-      <Estados
-        loading={loading}
-        error={error}
-        empty={!loading && !error && !j}
-      />
-      {!loading && !error && j && (
-        <>
-          <Link
-            className="mb-5 inline-block text-sm font-semibold text-white/60 hover:text-gamer-blue"
-            to="/"
-          >
-            ← Volver a la biblioteca
-          </Link>
-          <section className="detailhero mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
-                DETALLE DEL JUEGO
-              </p>
-              <h1 className="font-display text-4xl font-black">{j.nombre}</h1>
-              <p className="mt-2 text-white/65">
-                {j.plataforma} · {j.genero} ·{" "}
-                <span className={pillClass(j.estado)}>{j.estado}</span>
-              </p>
-            </div>
-            <Link
-              className="button inline-flex rounded-full bg-gamer-orange px-5 py-2.5 text-sm font-bold shadow-orangeglow"
-              to={`/videojuegos/${id}/editar`}
-            >
-              Editar juego
-            </Link>
-          </section>
-          <p className="eyebrow mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
-            RESUMEN CALCULADO
-          </p>
-          <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {[
-              ["SESIONES", r?.totalPartidas ?? 0],
-              ["HORAS JUGADAS", r?.horasTotales ?? 0],
-              ["AVANCE ACTUAL", `${r?.porcentajeAvanceActual ?? 0}%`],
-              [
-                "ÚLTIMA PARTIDA",
-                r?.ultimaPartida
-                  ? formatearFechaCivil(r.ultimaPartida)
-                  : "Sin sesiones",
-              ],
-            ].map(([label, val]) => (
-              <div
-                className="stat rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-float"
-                key={String(label)}
-              >
-                <small className="text-[11px] font-bold uppercase tracking-wider text-white/45">
-                  {label}
-                </small>
-                <strong className="mt-1 block font-display text-2xl font-black">
-                  {val}
-                </strong>
-              </div>
-            ))}
-          </div>
-          <div className="grid gap-5 lg:grid-cols-2">
-            <section className="panel rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-float md:p-6">
-              <div className="sectionhead mb-4 flex items-end justify-between">
-                <div>
-                  <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
-                    COLECCIONABLES
-                  </p>
-                  <h2 className="font-display text-xl font-extrabold">
-                    Logros
-                  </h2>
-                </div>
-                <span className="text-sm text-gamer-green">
-                  {j.logros.filter((l) => l.obtenido).length}/{j.logros.length}
-                </span>
-              </div>
-              {!j.logros.length ? (
-                <p className="text-sm text-white/55">
-                  Este juego aún no tiene logros registrados.
-                </p>
-              ) : (
-                j.logros.map((l) => (
-                  <label
-                    className="mb-1 flex cursor-pointer items-start gap-3 rounded-xl px-2 py-2 hover:bg-gamer-blue/10"
-                    key={l._id}
-                  >
-                    <input
-                      className="mt-1 accent-gamer-green"
-                      type="checkbox"
-                      checked={l.obtenido}
-                      onChange={(e) => logro(l._id, e.target.checked)}
-                    />
-                    <span>
-                      <b className="block text-sm">{l.nombre}</b>
-                      <small className="text-white/50">{l.descripcion}</small>
-                    </span>
-                  </label>
-                ))
-              )}
-            </section>
-            <section className="panel rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-float md:p-6">
-              <div className="sectionhead mb-4 flex items-end justify-between">
-                <div>
-                  <p className="eyebrow text-[11px] font-bold uppercase tracking-[0.2em] text-gamer-yellow">
-                    HISTORIAL
-                  </p>
-                  <h2 className="font-display text-xl font-extrabold">
-                    Partidas
-                  </h2>
-                </div>
-                <Link
-                  className="text-sm font-semibold text-gamer-blue"
-                  to={`/partidas/nueva?videojuego=${id}`}
-                >
-                  + Registrar
-                </Link>
-              </div>
-              {!ps.length ? (
-                <p className="text-sm text-white/55">
-                  Todavía no hay sesiones registradas.
-                </p>
-              ) : (
-                ps.map((p) => (
-                  <div
-                    className="flex items-center justify-between gap-3 border-t border-white/10 py-3 first:border-0"
-                    key={p._id}
-                  >
-                    <div>
-                      <b className="block text-sm">
-                        {formatearFechaCivil(p.fecha)}
-                      </b>
-                      <small className="text-white/50">
-                        {p.notas || "Sesión de juego"}
-                      </small>
-                    </div>
-                    <div className="text-right">
-                      <b className="block text-sm text-gamer-green">
-                        {Math.floor(p.duracionMinutos / 60)}h{" "}
-                        {p.duracionMinutos % 60}m
-                      </b>
-                      <small className="block text-white/50">
-                        {p.porcentajeAvance}% avance
-                      </small>
-                      <button
-                        type="button"
-                        onClick={() => eliminarRegistro(p._id)}
-                        className="mt-1 text-xs font-semibold text-gamer-orange hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-gamer-blue"
-                        aria-label="Eliminar partida"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </section>
-          </div>
-        </>
-      )}
-    </>
-  );
-}
-
 function ListaPartidas() {
   const [ps, setPs] = useState<Partida[]>([]);
   const [loading, setLoading] = useState(true);
@@ -992,7 +770,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<ListaJuegos />} />
           <Route path="/videojuegos/nuevo" element={<FormJuego />} />
-          <Route path="/videojuegos/:id" element={<Detalle />} />
+          <Route path="/videojuegos/:id" element={<DetalleVideojuego />} />
           <Route path="/videojuegos/:id/editar" element={<FormJuego />} />
           <Route path="/partidas" element={<ListaPartidas />} />
           <Route path="/partidas/nueva" element={<FormPartida />} />

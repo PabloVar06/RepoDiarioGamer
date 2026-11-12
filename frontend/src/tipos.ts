@@ -54,6 +54,13 @@ export interface MetaDTO {
   updatedAt: string;
 }
 
+export interface CrearMeta {
+  videojuego: string;
+  minutosObjetivo: number;
+  diasPorSemana: number;
+  hitos?: { descripcion: string; porcentajeObjetivo: number }[];
+}
+
 export interface ProgresoJuegoDTO {
   videojuego: string;
   zonaHoraria: "America/Guayaquil";
@@ -72,4 +79,12 @@ export interface ProgresoJuegoDTO {
 export interface DetalleErrorApi {
   campo: string;
   mensaje: string;
+}
+
+export interface RachasDTO {
+  ambito: "global";
+  zonaHoraria: "America/Guayaquil";
+  fechaLocalActual: string;
+  rachaActual: number;
+  mejorRacha: number;
 }

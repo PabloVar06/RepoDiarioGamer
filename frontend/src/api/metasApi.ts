@@ -1,8 +1,10 @@
 import type {
+  CrearMeta,
   DetalleErrorApi,
   HitoDTO,
   MetaDTO,
   ProgresoJuegoDTO,
+  RachasDTO,
 } from "../tipos";
 import { resolverBaseApi } from "./baseUrl";
 
@@ -145,69 +147,121 @@ function detallesPermitidos(valor: unknown): DetalleErrorApi[] | undefined {
   return detalles.length ? detalles : undefined;
 }
 
+function esRachas(valor: unknown): valor is RachasDTO {
+  return (
+    objeto(valor) &&
+    valor.ambito === "global" &&
+    valor.zonaHoraria === "America/Guayaquil" &&
+    fechaCivil(valor.fechaLocalActual) &&
+    entero(valor.rachaActual, 0, Number.MAX_SAFE_INTEGER) &&
+    entero(valor.mejorRacha, 0, Number.MAX_SAFE_INTEGER) &&
+    valor.mejorRacha >= valor.rachaActual
+  );
+}
+
+async function solicitar<T>(
+  ruta: string,
+  tipo: "progreso" | "rachas" | "meta",
+  esperado: number,
+  validar: (valor: unknown) => valor is T,
+  signal?: AbortSignal,
+  datos?: unknown,
+): Promise<T> {
+  comprobarCancelacion(signal);
+  let base: string;
+  try {
+    base = resolverBaseApi(import.meta.env.VITE_API_URL, import.meta.env.DEV);
+  } catch (error) {
+    throw new ErrorApi(
+      error instanceof Error
+        ? error.message
+        : "Revisa la configuración VITE_API_URL.",
+    );
+  }
+  const accion =
+    tipo === "meta"
+      ? "guardar la meta"
+      : tipo === "rachas"
+        ? "consultar las rachas"
+        : "consultar el progreso";
+  let respuesta: Response;
+  try {
+    respuesta = await fetch(`${base}${ruta}`, {
+      method: datos === undefined ? "GET" : "POST",
+      headers: {
+        Accept: "application/json",
+        ...(datos === undefined ? {} : { "Content-Type": "application/json" }),
+      },
+      signal,
+      ...(datos === undefined ? {} : { body: JSON.stringify(datos) }),
+    });
+  } catch (error) {
+    comprobarCancelacion(signal, error);
+    throw new ErrorApi(
+      "No pudimos conectar con la API. Revisa tu conexión e inténtalo de nuevo.",
+    );
+  }
+  let cuerpo: unknown;
+  if (respuesta.status !== 204) {
+    try {
+      cuerpo = await respuesta.json();
+    } catch (error) {
+      comprobarCancelacion(signal, error);
+    }
+  }
+  comprobarCancelacion(signal);
+  const objetoCuerpo = objeto(cuerpo) ? cuerpo : undefined;
+  const requestId =
+    texto(objetoCuerpo?.requestId) ??
+    texto(respuesta.headers.get("x-request-id"));
+  if (!respuesta.ok) {
+    const esServidor = respuesta.status >= 500;
+    throw new ErrorApi(
+      esServidor
+        ? `No pudimos ${accion}. Inténtalo de nuevo.`
+        : (texto(objetoCuerpo?.error) ??
+            `No pudimos ${accion} (HTTP ${respuesta.status}).`),
+      respuesta.status,
+      requestId,
+      esServidor ? undefined : detallesPermitidos(objetoCuerpo?.detalles),
+    );
+  }
+  if (respuesta.status !== esperado || !validar(cuerpo))
+    throw new ErrorApi(
+      `La API devolvió una respuesta de ${tipo} no válida. Inténtalo de nuevo.`,
+      respuesta.status,
+      requestId,
+    );
+  return cuerpo;
+}
+
 export const metasApi = {
-  async progreso(
+  crear(datos: CrearMeta): Promise<MetaDTO> {
+    return solicitar(
+      "/metas",
+      "meta",
+      201,
+      (valor): valor is MetaDTO =>
+        meta(valor) &&
+        valor.activa &&
+        valor.videojuego.toLowerCase() === datos.videojuego.toLowerCase(),
+      undefined,
+      datos,
+    );
+  },
+  progreso(
     videojuegoId: string,
     signal?: AbortSignal,
   ): Promise<ProgresoJuegoDTO> {
-    comprobarCancelacion(signal);
-    let base: string;
-    try {
-      base = resolverBaseApi(import.meta.env.VITE_API_URL, import.meta.env.DEV);
-    } catch (error) {
-      throw new ErrorApi(
-        error instanceof Error
-          ? error.message
-          : "Revisa la configuración VITE_API_URL.",
-      );
-    }
-    let respuesta: Response;
-    try {
-      respuesta = await fetch(
-        `${base}/videojuegos/${encodeURIComponent(videojuegoId)}/progreso`,
-        {
-          method: "GET",
-          headers: { Accept: "application/json" },
-          signal,
-        },
-      );
-    } catch (error) {
-      comprobarCancelacion(signal, error);
-      throw new ErrorApi(
-        "No pudimos conectar con la API. Revisa tu conexión e inténtalo de nuevo.",
-      );
-    }
-    let cuerpo: unknown;
-    if (respuesta.status !== 204) {
-      try {
-        cuerpo = await respuesta.json();
-      } catch (error) {
-        comprobarCancelacion(signal, error);
-      }
-    }
-    comprobarCancelacion(signal);
-    const datos = objeto(cuerpo) ? cuerpo : undefined;
-    const requestId =
-      texto(datos?.requestId) ?? texto(respuesta.headers.get("x-request-id"));
-    if (!respuesta.ok) {
-      const esServidor = respuesta.status >= 500;
-      throw new ErrorApi(
-        esServidor
-          ? "No pudimos consultar el progreso. Inténtalo de nuevo."
-          : (texto(datos?.error) ??
-              `No pudimos consultar el progreso (HTTP ${respuesta.status}).`),
-        respuesta.status,
-        requestId,
-        esServidor ? undefined : detallesPermitidos(datos?.detalles),
-      );
-    }
-    if (respuesta.status !== 200 || !esProgreso(cuerpo, videojuegoId)) {
-      throw new ErrorApi(
-        "La API devolvió una respuesta de progreso no válida. Inténtalo de nuevo.",
-        respuesta.status,
-        requestId,
-      );
-    }
-    return cuerpo;
+    return solicitar(
+      `/videojuegos/${encodeURIComponent(videojuegoId)}/progreso`,
+      "progreso",
+      200,
+      (valor): valor is ProgresoJuegoDTO => esProgreso(valor, videojuegoId),
+      signal,
+    );
+  },
+  rachas(signal?: AbortSignal): Promise<RachasDTO> {
+    return solicitar("/rachas", "rachas", 200, esRachas, signal);
   },
 };
