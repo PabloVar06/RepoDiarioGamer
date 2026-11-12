@@ -1,4 +1,3 @@
-
 import { conectarDB } from "./conexionDB";
 import { crearApp } from "./app";
 import { env } from "./config/env";
@@ -6,10 +5,12 @@ import { env } from "./config/env";
 async function main(): Promise<void> {
   await conectarDB();
 
-  const app = crearApp();
+  const app = crearApp({ frontendUrl: env.frontendUrl });
 
   app.listen(env.puerto, () => {
-    console.log(`API del Diario de Progreso Gamer escuchando en http://localhost:${env.puerto}`);
+    console.log(
+      `API del Diario de Progreso Gamer escuchando en http://localhost:${env.puerto}`,
+    );
     console.log(`Videojuegos: http://localhost:${env.puerto}/api/videojuegos`);
     console.log(`Partidas: http://localhost:${env.puerto}/api/partidas`);
     console.log(`Prueba: curl http://localhost:${env.puerto}/api/videojuegos`);
