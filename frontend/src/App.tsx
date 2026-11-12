@@ -748,17 +748,18 @@ function FormPartida() {
   const [avance, setAvance] = useState("0");
   const [notas, setNotas] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [errorCarga, setErrorCarga] = useState("");
+  const [errorEnvio, setErrorEnvio] = useState("");
   useEffect(() => {
     videojuegosApi
       .listar()
       .then(setJuegos)
-      .catch((e) => setError(e.message))
+      .catch((e) => setErrorCarga(e.message))
       .finally(() => setLoading(false));
   }, []);
   async function submit(e: FormEvent) {
     e.preventDefault();
-    setError("");
+    setErrorEnvio("");
     try {
       await partidasApi.crear({
         videojuego,
@@ -769,7 +770,7 @@ function FormPartida() {
       });
       nav(`/videojuegos/${videojuego}`);
     } catch (e) {
-      setError((e as Error).message);
+      setErrorEnvio((e as Error).message);
     }
   }
   const field =
@@ -784,14 +785,23 @@ function FormPartida() {
       </h1>
       <Estados
         loading={loading}
-        error={error}
-        empty={!loading && !error && !juegos.length}
+        error={errorCarga}
+        empty={!loading && !errorCarga && !juegos.length}
       />
-      {!loading && !error && juegos.length > 0 && (
+      {!loading && !errorCarga && juegos.length > 0 && (
         <form
           className="form space-y-4 rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-float md:p-8"
           onSubmit={submit}
         >
+          {errorEnvio && (
+            <p
+              role="alert"
+              className="rounded-aviso border border-borde bg-panel p-4 text-sm text-error"
+            >
+              No pudimos guardar la partida. {errorEnvio} Revisa los datos o la
+              conexión y vuelve a intentarlo.
+            </p>
+          )}
           <label className="block text-sm font-semibold">
             Videojuego
             <select
